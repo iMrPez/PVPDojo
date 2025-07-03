@@ -16,7 +16,24 @@ public interface PVPDojoConfig extends Config
     )
     String playSettings = "playSettings";
 
+    @ConfigSection(
+            name = "Player Settings",
+            description = "Player Settings",
+            position = 1
+    )
+    String playerSettings = "playerSettings";
 
+    @ConfigItem(
+            keyName = "playerHitPoints",
+            name = "Player HitPoints",
+            description = "Player HitPoints",
+            section = playerSettings,
+            position = 0
+    )
+    default int playerHitPoints()
+    {
+        return 99;
+    }
 
     @ConfigSection(
             name = "Dummy Settings",
@@ -26,13 +43,49 @@ public interface PVPDojoConfig extends Config
     String dummySettings = "dummySettings";
 
     @ConfigItem(
-            keyName = "usePrayer",
-            name = "Use Prayer",
+            keyName = "dummyHitPoints",
+            name = "Dummy HitPoints",
+            description = "Dummy HitPoints",
+            section = dummySettings,
+            position = 0
+    )
+    default int dummyHitPoints()
+    {
+        return 99;
+    }
+
+    @ConfigItem(
+            keyName = "useProtectionPrayers",
+            name = "Use Protection Prayer",
             description = "Should the Dummy use protection prayers?",
             section = dummySettings,
             position = 0
     )
-    default boolean usePrayer()
+    default boolean useProtectionPrayers()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "useOffensivePrayers",
+            name = "Use Offensive Prayer",
+            description = "Should the Dummy use offensive prayers?",
+            section = dummySettings,
+            position = 0
+    )
+    default boolean useOffensivePrayers()
+    {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "useDefensivePrayers",
+            name = "Use Defensive Prayer",
+            description = "Should the Dummy use defensive prayers?",
+            section = dummySettings,
+            position = 0
+    )
+    default boolean useDefensivePrayers()
     {
         return true;
     }
@@ -44,6 +97,7 @@ public interface PVPDojoConfig extends Config
             section = dummySettings,
             position = 1
     )
+
     default int prayerSwapDelay()
     {
         return 15;
@@ -84,38 +138,5 @@ public interface PVPDojoConfig extends Config
     {
         return 2;
     }
-
-
-    @ConfigSection(
-            name = "Setup Settings",
-            description = "Setup Settings.",
-            position = 2
-    )
-    String setupSettings = "setupSettings";
-
-    @ConfigItem(
-            keyName = "dummyHitPoints",
-            name = "Dummy HitPoints",
-            description = "Dummy HitPoints",
-            section = setupSettings,
-            position = 0
-    )
-    default int dummyHitPoints()
-    {
-        return 99;
-    }
-
-    @ConfigItem(
-            keyName = "playerHitPoints",
-            name = "Player HitPoints",
-            description = "Player HitPoints",
-            section = setupSettings,
-            position = 0
-    )
-    default int playerHitPoints()
-    {
-        return 99;
-    }
-
 
 }

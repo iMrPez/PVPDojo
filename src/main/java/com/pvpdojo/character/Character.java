@@ -1,6 +1,5 @@
 package com.pvpdojo.character;
 
-import com.pvpdojo.CharacterObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

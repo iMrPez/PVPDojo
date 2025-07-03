@@ -15,7 +15,6 @@ public class CustomModelComp
     private ModelStats[] modelStats;
     private int[] kitRecolours;
     private DetailedModel[] detailedModels;
-    private BlenderModel blenderModel;
     private LightingStyle lightingStyle;
     private CustomLighting customLighting;
     private boolean priority;

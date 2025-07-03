@@ -12,10 +12,7 @@ public enum CustomModelType
     CACHE_GROUND_ITEM("Ground Item"),
     CACHE_MAN_WEAR("Male Worn Item"),
     CACHE_WOMAN_WEAR("Female Worn Item"),
-    CACHE_SPOTANIM("SpotAnim"),
-    BLENDER("Blender")
-
-    ;
+    CACHE_SPOTANIM("SpotAnim");
 
     private final String name;
 

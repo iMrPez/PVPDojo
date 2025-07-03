@@ -3,21 +3,7 @@ package com.pvpdojo;
 
 
 /*
-*
-* Add Range limits by removing context menu in ModelGetter if out of range (DONE)
-* Add Being able to be frozen, and prevent the user from moving by adding a context menu whenever "Walk here" is that eats the user input. (DONE)
-* Add Player Health bar (DONE)
-* Add Tracking for attack style (DONE)
-* Add Tracking for equipment stats (DONE)
-* Add Defensive stats and attack damage randomization (KINDA DONE)
-* Add Random Movement (DONE)
-* Add Movement Zone Limits, Potentially prevent user from leaving arena?
-* Add Special Attacks (In Progress)
-* Add Protection Prayer Tracking for player (DONE)
-* Include protection prayers in damage calculations (DONE)
-* Add Food/Potion Consumtion (DONE)
 * Add Special Attack Recharging with check for lightbearer
-* Add Special Attack Orb Overlay like the hp one.
 * */
 
 
@@ -25,6 +11,19 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import com.pvpdojo.character.*;
+import com.pvpdojo.character.datatypes.Coordinate;
+import com.pvpdojo.character.datatypes.WeaponData;
+import com.pvpdojo.combat.CombatUtility;
+import com.pvpdojo.combat.equipment.EquipmentStats;
+import com.pvpdojo.combat.equipment.EquipmentUtility;
+import com.pvpdojo.combat.Prayers;
+import com.pvpdojo.combatant.CorePlayer;
+import com.pvpdojo.combatant.Dummy;
+import com.pvpdojo.overlays.*;
+import com.pvpdojo.pathfinding.MovementType;
+import com.pvpdojo.pathfinding.PathFinder;
+import com.pvpdojo.program.Program;
+import com.pvpdojo.program.ProgramComp;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -48,7 +47,8 @@ import java.util.List;
 
 
 @PluginDescriptor(
-	name = "PVP Dojo"
+	name = "PVP Dojo",
+	description = "PVP Practice Tool"
 )
 public class PVPDojoPlugin extends Plugin
 {
@@ -522,13 +522,13 @@ public class PVPDojoPlugin extends Plugin
 	{
 		if (corePlayer.prayers.contains(prayer.prayer))
 		{
-			PVPUtility.playSound(client, 2663);
+			EquipmentUtility.playSound(client, 2663);
 			corePlayer.removePrayer(prayer.prayer);
 			corePlayer.updateOverheadPrayers();
 		}
 		else
 		{
-			PVPUtility.playSound(client, prayer.soundID);
+			EquipmentUtility.playSound(client, prayer.soundID);
 			corePlayer.addPrayer(prayer);
 			corePlayer.updateOverheadPrayers();
 		}
