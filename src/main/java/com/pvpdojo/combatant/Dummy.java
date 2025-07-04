@@ -76,31 +76,9 @@ public class Dummy extends Combatant
         triggerGameTick();
 
 
-        if (plugin.hasFightStarted() && false)
+        if (plugin.hasFightStarted())
         {
             combatAI.OnGameTick();
-
-            /*if (combatStyle != CombatStyle.MELEE)
-            {
-                setCombatStyle(CombatStyle.MELEE);
-            }
-
-            if (getDistanceToPlayer() == 1)
-            {
-                if (combatActionTicks <= 1)
-                {
-                    tryAttack();
-                    lookAtLocation(client.getLocalPlayer().getLocalLocation(), 2);
-                }
-            }
-            else
-            {
-                if (!isFrozen)
-                {
-                    moveToPlayer(true);
-                }
-            }*/
-
         }
 
         if (lookingAtTarget && lookAtTimer > 0)
@@ -559,6 +537,7 @@ public class Dummy extends Combatant
     @Override
     public void fightStarted()
     {
+        resetConsumables();
         startLocation = WorldPoint.fromLocal(client, dummyCharacter.getCharacterObject().getLocation());
     }
 
@@ -568,6 +547,15 @@ public class Dummy extends Combatant
         combatAI.reset();
         reset();
         plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, config.dummyHitPoints(), config.dummyHitPoints()));
+
+
+    }
+
+    private void resetConsumables()
+    {
+        hardFoodUses = config.dummyHardFood();
+        comboFoodUses = config.dummyComboFood();
+        saraBrewUses = config.dummyBrewDoses();
     }
 
     @Override

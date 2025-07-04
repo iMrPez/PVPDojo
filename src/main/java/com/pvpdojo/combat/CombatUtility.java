@@ -302,24 +302,14 @@ public class CombatUtility
     {
         if (menuEntry.getOption().contains("Eat"))
         {
-            if (menuEntry.getTarget().contains("Anglerfish"))
-                return new InventoryItem("Anglerfish", InventoryItemType.HARD_FOOD,
-                        new InventoryUseProperties(22, true, false, 0, 0, 0, 0, 0));
-
-            if (menuEntry.getTarget().contains("Cooked karambwan"))
-                return new InventoryItem("Cooked karambwan", InventoryItemType.COMBO_FOOD,
-                        new InventoryUseProperties(18, false, false, 0, 0, 0, 0, 0));
+            if (menuEntry.getTarget().contains("Anglerfish")) return InventoryItem.ANGLERFISH;
+            if (menuEntry.getTarget().contains("Cooked karambwan")) return InventoryItem.KARAMBWAN;
         }
 
         if (menuEntry.getOption().contains("Drink"))
         {
-            if (menuEntry.getTarget().contains("Saradomin brew"))
-                return new InventoryItem("Saradomin brew", InventoryItemType.SARA_BREW,
-                        new InventoryUseProperties(16, true, true, -14, -14, 21, -14, -14));
-
-            if (menuEntry.getTarget().contains("Super restore"))
-                return new InventoryItem("Super restore", InventoryItemType.SUPER_RESTORE,
-                        new InventoryUseProperties(0, false, false, 32, 32, 32, 32, 32));
+            if (menuEntry.getTarget().contains("Saradomin brew")) return InventoryItem.SARADOMIN_BREW;
+            if (menuEntry.getTarget().contains("Super restore")) return InventoryItem.ANGLERFISH;
         }
 
         return null;

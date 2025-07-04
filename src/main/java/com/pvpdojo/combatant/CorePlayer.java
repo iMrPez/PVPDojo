@@ -126,8 +126,9 @@ public class CorePlayer extends Combatant
     }
 
     @Override
-    public void fightStarted() {
-
+    public void fightStarted()
+    {
+        resetConsumables();
     }
 
     @Override
@@ -138,6 +139,13 @@ public class CorePlayer extends Combatant
         prayers.clear();
         updateOverheadPrayers();
         plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, config.playerHitPoints(), config.playerHitPoints()));
+
+    }
+
+    private void resetConsumables() {
+        hardFoodUses = config.playerHardFood();
+        comboFoodUses = config.playerComboFood();
+        saraBrewUses = config.playerBrewDoses();
     }
 
     @Override

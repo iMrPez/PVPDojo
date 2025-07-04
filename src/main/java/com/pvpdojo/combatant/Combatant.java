@@ -30,7 +30,7 @@ public abstract class Combatant
     public int combatActionTicks = 0;
 
     protected int foodActionTicks = 0;
-    protected int fastFoodActionTicks = 0;
+    protected int comboFoodActionTicks = 0;
     protected int potionActionTicks = 0;
 
     protected boolean hasRequestedItemUse = false;
@@ -101,9 +101,9 @@ public abstract class Combatant
             foodActionTicks--;
         }
 
-        if (fastFoodActionTicks > 0)
+        if (comboFoodActionTicks > 0)
         {
-            fastFoodActionTicks--;
+            comboFoodActionTicks--;
         }
 
         if (potionActionTicks > 0)
@@ -207,7 +207,7 @@ public abstract class Combatant
             case HARD_FOOD:
                 return foodActionTicks;
             case COMBO_FOOD:
-                return fastFoodActionTicks;
+                return comboFoodActionTicks;
             case SARA_BREW:
             case SUPER_RESTORE:
                 return potionActionTicks;
@@ -250,7 +250,7 @@ public abstract class Combatant
                 if (hardFoodUses <= 0) return 1;
                 break;
             case COMBO_FOOD:
-                if (fastFoodActionTicks > 0) return 0;
+                if (comboFoodActionTicks > 0) return 0;
                 if (comboFoodUses <= 0) return 1;
                 break;
             case SARA_BREW:
@@ -303,7 +303,7 @@ public abstract class Combatant
                     combatActionTicks += 2;
                 }
                 foodActionTicks = 3;
-                fastFoodActionTicks = 3;
+                comboFoodActionTicks = 3;
                 potionActionTicks = 3;
                 comboFoodUses--;
                 applyItemProperties(item.useProperties);
@@ -448,7 +448,7 @@ public abstract class Combatant
         hasRequestedAttack = false;
         hasRequestedItemUse = false;
         foodActionTicks = 0;
-        fastFoodActionTicks = 0;
+        comboFoodActionTicks = 0;
         potionActionTicks = 0;
     }
 

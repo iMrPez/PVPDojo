@@ -9,6 +9,7 @@ package com.pvpdojo;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
+import javax.swing.*;
 
 import com.pvpdojo.character.*;
 import com.pvpdojo.character.datatypes.Coordinate;
@@ -38,10 +39,12 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +117,8 @@ public class PVPDojoPlugin extends Plugin
 	private NavigationButton navButton;
 	private boolean hasDummySpawned = false;
 
+	private FightSetupPanel panel;
+
 	@Override
 	protected void startUp() throws Exception
 	{
@@ -127,6 +132,27 @@ public class PVPDojoPlugin extends Plugin
 		overlayManager.add(specialBarOverlay);
 		overlayManager.add(fightOverlay);
 		overlayManager.add(prayerOverlay);
+
+		panel = injector.getInstance(FightSetupPanel.class);
+		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/skull_blue.png");
+		navButton = NavigationButton.builder()
+				.tooltip("PvP Fight History")
+				.icon(icon)
+				.priority(6)
+				.panel(panel)
+				.build();
+
+
+		clientToolbar.addNavigation(navButton);
+
+
+		// Explicitly rebuild panel after all setup and import.
+		SwingUtilities.invokeLater(() ->
+		{
+			if (panel != null) {
+				panel.rebuild();
+			}
+		});
 	}
 
 	@Override

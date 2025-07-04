@@ -1,8 +1,10 @@
-package com.pvpdojo.combat;
+package com.pvpdojo.combatant;
 
 import com.pvpdojo.PVPDojoConfig;
 import com.pvpdojo.PVPDojoPlugin;
-import com.pvpdojo.combatant.Dummy;
+import com.pvpdojo.combat.CombatStyle;
+import com.pvpdojo.combat.Spell;
+import com.pvpdojo.combat.inventory.InventoryItem;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import org.slf4j.Logger;
@@ -44,9 +46,17 @@ public class CombatAI
 
     public void OnGameTick()
     {
-        CheckForPrayerSwitch();
+        if (config.useConsumables())
+        {
+            checkForConsumableUse();
+        }
 
-        CheckForEquipmentSwitch();
+        if (config.useProtectionPrayers())
+        {
+            checkForPrayerSwitch();
+        }
+
+        checkForEquipmentSwitch();
 
         TryToAttack();
 
@@ -83,7 +93,7 @@ public class CombatAI
         dummy.lookAtLocation(client.getLocalPlayer().getLocalLocation(), 2);
     }
 
-    private void CheckForEquipmentSwitch()
+    private void checkForEquipmentSwitch()
     {
         if (equipmentSwapTimer > 0)
         {
@@ -132,7 +142,7 @@ public class CombatAI
         }
     }
 
-    private void CheckForPrayerSwitch()
+    private void checkForPrayerSwitch()
     {
         if (prayerSwapTimer > 0)
         {
@@ -168,6 +178,73 @@ public class CombatAI
                 }
             }
         }
+    }
+
+    public boolean checkForConsumableUse()
+    {
+        var dummyHP = dummy.getHealth();
+        Random random = new Random();
+        var randomRange = random.nextInt(config.consumableUseRange());
+
+        if (dummyHP > 0 && dummyHP <= config.tripleEatAt() - randomRange && canTripleEat())
+        {
+            tripleEat();
+            return true;
+        }
+        else if (dummyHP > 0 && dummyHP <= config.singleHardFoodAt() - randomRange && canEatHardFood())
+        {
+            eatHardFood();
+            return true;
+        }
+        else if (dummyHP > 0 && dummyHP <= config.singleBrewDrinkAt() - randomRange && canDrinkPotion())
+        {
+            drinkSaraBrewDose();
+            return false;
+        }
+
+        return false;
+    }
+
+    public void eatHardFood()
+    {
+        dummy.requestItemUse(InventoryItem.ANGLERFISH);
+    }
+
+    public void eatComboFood()
+    {
+        dummy.requestItemUse(InventoryItem.KARAMBWAN);
+    }
+
+    public void drinkSaraBrewDose()
+    {
+        dummy.requestItemUse(InventoryItem.SARADOMIN_BREW);
+    }
+
+    public void tripleEat()
+    {
+        eatHardFood();
+        drinkSaraBrewDose();
+        eatComboFood();
+    }
+
+    public boolean canEatHardFood()
+    {
+        return dummy.foodActionTicks <= 1;
+    }
+
+    public boolean canEatComboFood()
+    {
+        return dummy.comboFoodActionTicks <= 1;
+    }
+
+    public boolean canDrinkPotion()
+    {
+        return dummy.potionActionTicks <= 1;
+    }
+
+    public boolean canTripleEat()
+    {
+        return canEatHardFood() && canEatComboFood() && canDrinkPotion();
     }
 
 
