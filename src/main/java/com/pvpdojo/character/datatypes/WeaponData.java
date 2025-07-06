@@ -93,6 +93,8 @@ public class WeaponData
 
     public CombatStyle getWeaponCombatStyle()
     {
+        if (weaponType == 18) return CombatStyle.MAGIC; // if its a staff it'll auto return magic.
+
         switch (getStyleType())
         {
             case NONE:

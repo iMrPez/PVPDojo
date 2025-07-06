@@ -3,12 +3,14 @@ package com.pvpdojo.character;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class ModelStats
 {
+    private static final Logger log = LoggerFactory.getLogger(ModelStats.class);
     private int modelId;
     private BodyPart bodyPart;
     private short[] recolourFrom;
@@ -20,6 +22,65 @@ public class ModelStats
     private int resizeZ;
     private int translateZ;
     private CustomLighting lighting;
+    private int[] kitRecolours;
+
+
+    public ModelStats(int modelId, BodyPart bodyPart, short[] recolourFrom, short[] recolourTo, short[] textureFrom, short[] textureTo, int resizeX, int resizeY, int resizeZ, int translateZ, CustomLighting lighting, int[] kitRecolours)
+    {
+        this.modelId = modelId;
+        this.bodyPart = bodyPart;
+        this.recolourFrom = recolourFrom;
+        this.recolourTo = recolourTo;
+        this.textureFrom = textureFrom;
+        this.textureTo = textureTo;
+        this.resizeX = resizeX;
+        this.resizeY = resizeY;
+        this.resizeZ = resizeZ;
+        this.translateZ = translateZ;
+        this.lighting = lighting;
+        this.kitRecolours = kitRecolours;
+    }
+
+    public ModelStats(int modelId, BodyPart bodyPart, short[] recolourFrom, short[] recolourTo, short[] textureFrom, short[] textureTo, int resizeX, int resizeY, int resizeZ, int translateZ, CustomLighting lighting)
+    {
+        this.modelId = modelId;
+        this.bodyPart = bodyPart;
+        this.recolourFrom = recolourFrom;
+        this.recolourTo = recolourTo;
+        this.textureFrom = textureFrom;
+        this.textureTo = textureTo;
+        this.resizeX = resizeX;
+        this.resizeY = resizeY;
+        this.resizeZ = resizeZ;
+        this.translateZ = translateZ;
+        this.lighting = lighting;
+    }
+
+    @Override
+    public String toString() {
+        return "\nModelID: " + modelId +
+                "\nBodyPart: " + bodyPart.name() +
+                "\nrecolourFrom: " + arrayToText(recolourFrom) +
+                "\nrecolourTo: " + arrayToText(recolourTo) +
+                "\ntextureFrom: " + arrayToText(textureFrom) +
+                "\ntextureTo: " + arrayToText(textureTo) +
+                "\nresizeX: " + resizeX +
+                "\nresizeY: " + resizeY +
+                "\nresizeZ: " + resizeZ +
+                "\ntranslateZ: " + translateZ;
+    }
+
+    public String arrayToText(short[] array)
+    {
+        StringBuilder values = new StringBuilder();
+        for (int i = 0; i < array.length; i++)
+        {
+            log.info("ADDING: " + array[i]);
+            values.append("(").append(array[i]).append("), ");
+        }
+
+        return values.toString();
+    }
 
     public int getModelId() {
         return modelId;
@@ -109,5 +170,11 @@ public class ModelStats
         this.translateZ = translateZ;
     }
 
+    public int[] getKitRecolours() {
+        return kitRecolours;
+    }
 
+    public void setKitRecolours(int[] kitRecolours) {
+        this.kitRecolours = kitRecolours;
+    }
 }

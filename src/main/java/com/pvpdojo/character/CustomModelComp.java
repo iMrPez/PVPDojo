@@ -13,7 +13,6 @@ public class CustomModelComp
     private CustomModelType type;
     private int modelId;
     private ModelStats[] modelStats;
-    private int[] kitRecolours;
     private DetailedModel[] detailedModels;
     private LightingStyle lightingStyle;
     private CustomLighting customLighting;

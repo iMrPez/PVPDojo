@@ -1,0 +1,653 @@
+JFDML JFormDesigner: "8.2.4.0.393" Java: "21.0.7" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.CardLayout ) ) {
+			name: "this"
+			"preferredSize": new java.awt.Dimension( 100, 743 )
+			"maximumSize": new java.awt.Dimension( 100, 2147483647 )
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "scrollPanel"
+				"maximumSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 1
+				} ) {
+					name: "contents"
+					"maximumSize": new java.awt.Dimension( 100, 1000 )
+					"preferredSize": new java.awt.Dimension( 100, 800 )
+					"minimumSize": new java.awt.Dimension( 100, 1000 )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "header"
+						"text": "PVP Dojo"
+						"alignmentX": 0.5f
+						"horizontalTextPosition": 0
+						"horizontalAlignment": 0
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 11, false )
+						"maximumSize": new java.awt.Dimension( 110, 40 )
+						"minimumSize": new java.awt.Dimension( 110, 40 )
+						"preferredSize": new java.awt.Dimension( 110, 40 )
+					} )
+					add( new FormComponent( "javax.swing.JSeparator" ) {
+						name: "separator1"
+						"preferredSize": new java.awt.Dimension( 0, 6 )
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+						name: "playerStatsPanel"
+						"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"preferredSize": new java.awt.Dimension( 120, 130 )
+						"minimumSize": new java.awt.Dimension( 120, 130 )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+							"autoSize": false
+						} ) {
+							name: "playerStatsBackground"
+							"background": sfield java.awt.Color darkGray
+							"preferredSize": new java.awt.Dimension( 210, 120 )
+							"border": &LineBorder0 new javax.swing.border.LineBorder( sfield java.awt.Color black, 1, false )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+								"columns": 3
+								"rows": 4
+							} ) {
+								name: "playerStats"
+								"preferredSize": &Dimension0 new java.awt.Dimension( 190, 100 )
+								"minimumSize": &Dimension1 new java.awt.Dimension( 240, 96 )
+								"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+								"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+									name: "playerHeaderPanel"
+									"minimumSize": &Dimension2 new java.awt.Dimension( 60, 17 )
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerHeaderLabel"
+										"text": "Player Stats"
+										"horizontalAlignment": 0
+										"preferredSize": &Dimension3 new java.awt.Dimension( 60, 17 )
+										"maximumSize": &Dimension4 new java.awt.Dimension( 60, 17 )
+										"verticalAlignment": 1
+										"font": new java.awt.Font( "Inter", 1, 13 )
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "Center"
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerHitpointsPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									"minimumSize": &Dimension5 new java.awt.Dimension( 80, 24 )
+									"preferredSize": &Dimension6 new java.awt.Dimension( 80, 24 )
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerHitpointsIcon"
+										"icon": &SwingIcon0 new com.jformdesigner.model.SwingIcon( 0, "/skills/Hitpoints_icon.png" )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+										"y": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerHitpointsSpinner"
+										"preferredSize": &Dimension7 new java.awt.Dimension( 65, 24 )
+										"model": &SpinnerNumberModel0 new javax.swing.SpinnerNumberModel( 99, 10, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerAttackPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerAttackIcon"
+										"preferredSize": &Dimension8 new java.awt.Dimension( 24, 24 )
+										"icon": &SwingIcon1 new com.jformdesigner.model.SwingIcon( 0, "/skills/Attack_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerAttackSpinner"
+										"preferredSize": &Dimension9 new java.awt.Dimension( 65, 24 )
+										"model": &SpinnerNumberModel1 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerStrengthPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerStrengthIcon"
+										"preferredSize": #Dimension8
+										"icon": &SwingIcon2 new com.jformdesigner.model.SwingIcon( 0, "/skills/Strength_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerStrengthSpinner"
+										"preferredSize": #Dimension9
+										"model": &SpinnerNumberModel2 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerDefencePanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerDefenceIcon"
+										"preferredSize": #Dimension8
+										"icon": &SwingIcon3 new com.jformdesigner.model.SwingIcon( 0, "/skills/Defence_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerDefenceSpinner"
+										"preferredSize": #Dimension9
+										"model": &SpinnerNumberModel3 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerRangePanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									"preferredSize": &Dimension10 new java.awt.Dimension( 60, 24 )
+									"minimumSize": &Dimension11 new java.awt.Dimension( 60, 24 )
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerRangeIcon"
+										"preferredSize": #Dimension8
+										"icon": &SwingIcon4 new com.jformdesigner.model.SwingIcon( 0, "/skills/Ranged_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerRangeSpinner"
+										"preferredSize": #Dimension9
+										"model": &SpinnerNumberModel4 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerPrayerPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerPrayerIcon"
+										"preferredSize": #Dimension8
+										"icon": &SwingIcon5 new com.jformdesigner.model.SwingIcon( 0, "/skills/Prayer_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerPrayerSpinner"
+										"preferredSize": #Dimension9
+										"model": &SpinnerNumberModel5 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "playerMagicPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "playerMagicIcon"
+										"preferredSize": #Dimension8
+										"icon": &SwingIcon6 new com.jformdesigner.model.SwingIcon( 0, "/skills/Magic_icon.png" )
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "playerMagicSpinner"
+										"preferredSize": #Dimension9
+										"model": &SpinnerNumberModel6 new javax.swing.SpinnerNumberModel( 99, 1, 99, 1 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+								"width": 190
+								"height": 100
+								"x": 10
+								"y": 10
+							} )
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+						name: "dummyStatsPanel"
+						"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"preferredSize": new java.awt.Dimension( 120, 130 )
+						"minimumSize": new java.awt.Dimension( 120, 130 )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+							"autoSize": false
+						} ) {
+							name: "dummyStatsBackground"
+							"background": sfield java.awt.Color darkGray
+							"preferredSize": new java.awt.Dimension( 210, 120 )
+							"border": #LineBorder0
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+								"columns": 3
+								"rows": 4
+							} ) {
+								name: "dummyStats"
+								"preferredSize": #Dimension0
+								"minimumSize": #Dimension1
+								"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+								"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+									name: "dummyHeaderPanel"
+									"minimumSize": #Dimension2
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyHeaderLabel"
+										"text": "Dummy Stats"
+										"horizontalAlignment": 0
+										"preferredSize": #Dimension3
+										"maximumSize": #Dimension4
+										"verticalAlignment": 1
+										"font": new java.awt.Font( "Inter", 1, 13 )
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "Center"
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyHitpointsPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									"minimumSize": #Dimension5
+									"preferredSize": #Dimension6
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyHitpointsIcon"
+										"icon": #SwingIcon0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+										"y": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyHitpointsSpinner"
+										"preferredSize": #Dimension7
+										"model": #SpinnerNumberModel0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyAttackPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyAttackIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon1
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyAttackSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel1
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyStrengthPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyStrengthIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon2
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyStrengthSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel2
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyDefencePanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyDefenceIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon3
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyDefenceSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel3
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyRangePanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									"preferredSize": #Dimension10
+									"minimumSize": #Dimension11
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyRangeIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon4
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyRangeSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel4
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyPrayerPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyPrayerIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon5
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyPrayerSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel5
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+									name: "dummyMagicPanel"
+									"background": sfield com.jformdesigner.model.FormObject NULL_VALUE
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "dummyMagicIcon"
+										"preferredSize": #Dimension8
+										"icon": #SwingIcon6
+										"opaque": false
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 3
+									} )
+									add( new FormComponent( "javax.swing.JSpinner" ) {
+										name: "dummyMagicSpinner"
+										"preferredSize": #Dimension9
+										"model": #SpinnerNumberModel6
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"y": 0
+										"x": 30
+									} )
+								} )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+								"width": 190
+								"height": 100
+								"x": 10
+								"y": 10
+							} )
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+						name: "dummyEquipmentOptionsPanel"
+						"preferredSize": new java.awt.Dimension( 120, 120 )
+						"minimumSize": new java.awt.Dimension( 120, 120 )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+							"axis": 1
+						} ) {
+							name: "dummyEquipmentOptionsBox"
+							"minimumSize": new java.awt.Dimension( 210, 100 )
+							"preferredSize": new java.awt.Dimension( 210, 100 )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+								name: "optionHeaderPanel"
+								"font": new java.awt.Font( "Inter", 0, 16 )
+								"preferredSize": new java.awt.Dimension( 66, 15 )
+								add( new FormComponent( "javax.swing.JLabel" ) {
+									name: "optionHeaderLabel"
+									"horizontalAlignment": 0
+									"text": "Equipment"
+									"preferredSize": &Dimension12 new java.awt.Dimension( 66, 15 )
+								}, new FormLayoutConstraints( class java.lang.String ) {
+									"value": "Center"
+								} )
+							} )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+								"columns": 4
+								"rows": 2
+								"hgap": 5
+								"vgap": 5
+							} ) {
+								name: "dummyEquipmentOptions"
+								"preferredSize": new java.awt.Dimension( 340, 75 )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+									name: "meleeEquipmentPanel"
+									"background": sfield java.awt.Color darkGray
+									"opaque": false
+									"preferredSize": new java.awt.Dimension( 82, 34 )
+									"minimumSize": new java.awt.Dimension( 82, 30 )
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "meleeButton"
+										"text": "MELEE"
+										"foreground": new java.awt.Color( 255, 0, 0, 255 )
+										"font": &Font0 new java.awt.Font( "Inter", 1, 13 )
+										"border": #LineBorder0
+										"background": &Color0 new java.awt.Color( 51, 51, 51, 255 )
+										"maximumSize": new java.awt.Dimension( 82, 34 )
+										"minimumSize": new java.awt.Dimension( 82, 34 )
+										"preferredSize": new java.awt.Dimension( 82, 34 )
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "North"
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) {
+									"hgap": 5
+									"vgap": 5
+								} ) {
+									name: "rangeEquipmentPanel"
+									"background": sfield java.awt.Color darkGray
+									"opaque": false
+									"preferredSize": new java.awt.Dimension( 82, 34 )
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "rangeButton"
+										"text": "RANGE"
+										"foreground": new java.awt.Color( 51, 255, 0, 255 )
+										"font": #Font0
+										"border": #LineBorder0
+										"background": #Color0
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "Center"
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+									name: "magicEquipmentPanel"
+									"background": sfield java.awt.Color darkGray
+									"opaque": false
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "magicButton"
+										"text": "MAGIC"
+										"foreground": new java.awt.Color( 0, 102, 255, 255 )
+										"font": #Font0
+										"border": #LineBorder0
+										"background": #Color0
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "Center"
+									} )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+									name: "specEquipmentPanel"
+									"background": sfield java.awt.Color darkGray
+									"opaque": false
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "specButton"
+										"text": "SPEC"
+										"foreground": new java.awt.Color( 255, 255, 0, 255 )
+										"font": #Font0
+										"border": #LineBorder0
+										"background": #Color0
+									}, new FormLayoutConstraints( class java.lang.String ) {
+										"value": "Center"
+									} )
+								} )
+							} )
+						} )
+					} )
+					add( new FormComponent( "javax.swing.JSeparator" ) {
+						name: "separator2"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+						"axis": 1
+					} ) {
+						name: "equipmentPanel"
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+							name: "equipmentOptions"
+							"minimumSize": new java.awt.Dimension( 150, 85 )
+							"preferredSize": new java.awt.Dimension( 150, 85 )
+							"maximumSize": new java.awt.Dimension( 32767, 85 )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+								"axis": 1
+							} ) {
+								name: "optionButtons"
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "addEquippedButton"
+									"text": "ADD EQUIPPED"
+									"foreground": new java.awt.Color( 62, 154, 62, 255 )
+									"font": #Font0
+									"maximumSize": new java.awt.Dimension( 140, 34 )
+									"minimumSize": new java.awt.Dimension( 140, 34 )
+									"preferredSize": new java.awt.Dimension( 140, 34 )
+									"border": #LineBorder0
+									"background": #Color0
+								} )
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "clearButton"
+									"text": "CLEAR"
+									"foreground": new java.awt.Color( 197, 53, 53, 255 )
+									"font": #Font0
+									"preferredSize": new java.awt.Dimension( 140, 34 )
+									"maximumSize": new java.awt.Dimension( 140, 34 )
+									"minimumSize": new java.awt.Dimension( 140, 34 )
+									"border": #LineBorder0
+									"background": #Color0
+								} )
+							} )
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+						name: "equipmentListPanel"
+						"preferredSize": new java.awt.Dimension( 200, 400 )
+						"minimumSize": new java.awt.Dimension( 26, 400 )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "selectedEquipment"
+							"horizontalAlignment": 0
+							"text": "MELEE"
+							"preferredSize": #Dimension12
+						} )
+						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+							name: "equipmentScrollPanel"
+							"maximumSize": new java.awt.Dimension( 300, 400 )
+							"minimumSize": new java.awt.Dimension( 16, 400 )
+							"preferredSize": new java.awt.Dimension( 200, 400 )
+							"border": #LineBorder0
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+								"axis": 1
+							} ) {
+								name: "equipmentContent"
+								"preferredSize": new java.awt.Dimension( 195, 35 )
+								"maximumSize": new java.awt.Dimension( 195, 35 )
+								"minimumSize": new java.awt.Dimension( 198, 35 )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+									"autoSize": false
+								} ) {
+									name: "equipmentItem"
+									"preferredSize": new java.awt.Dimension( 395, 60 )
+									"border": new javax.swing.border.LineBorder( sfield java.awt.Color gray, 1, false )
+									"background": new java.awt.Color( 51, 51, 51, 255 )
+									"maximumSize": new java.awt.Dimension( 395, 35 )
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "icon"
+										"icon": new com.jformdesigner.model.SwingIcon( 0, "/skull_blue.png" )
+										"horizontalTextPosition": 0
+										"horizontalAlignment": 0
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"width": 25
+										"x": 5
+										"y": 5
+										"height": 25
+									} )
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "itemNameLabel"
+										"text": "Dragon Scimitar"
+										"font": new java.awt.Font( "Inter", 0, 11 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 35
+										"y": 5
+									} )
+									add( new FormComponent( "javax.swing.JLabel" ) {
+										name: "equipmentSlotLabel"
+										"text": "Main-Hand"
+										"font": new java.awt.Font( "Inter", 0, 8 )
+										"foreground": new java.awt.Color( 153, 153, 153, 255 )
+										"horizontalAlignment": 2
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"width": 99
+										"height": 12
+										"x": 35
+										"y": 18
+									} )
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "removeEquipmentButton"
+										"text": "-"
+										"preferredSize": new java.awt.Dimension( 20, 20 )
+										"border": new javax.swing.border.LineBorder( sfield java.awt.Color red, 1, false )
+										"foreground": new java.awt.Color( 255, 0, 0, 255 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+										"x": 170
+										"y": 7
+									} )
+								} )
+							} )
+						} )
+					} )
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "card1"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 240, 645 )
+		} )
+	}
+}

@@ -57,12 +57,16 @@ public class Dummy extends Combatant
 
     public final CombatAI combatAI;
 
+    public final EquipmentHandler equipment = new EquipmentHandler();
+
     public Dummy(Client client, PVPDojoPlugin plugin, PVPDojoConfig config, PathFinder pathFinder)
     {
         this.client = client;
         this.plugin = plugin;
         this.config = config;
         this.pathFinder = pathFinder;
+
+        setCombatStyle(CombatStyle.MAGIC);
         dummyCharacter = initializeCharacter(client.getLocalPlayer());
         spawn();
 
@@ -110,14 +114,13 @@ public class Dummy extends Combatant
 
         updatePathing();
 
-        setModel(dummyCharacter, getStyleModel());
+        setModel(dummyCharacter, getModel());
 
     }
 
 
     public void tryAttack(Spell spell)
     {
-        log.info("Dummy Try Attack");
         var weaponData = getWeaponData();
         var attackData = new AttackData(spell, weaponData, isTryingToSpec, getSpecCount());
         requestAttack(attackData);
@@ -372,24 +375,15 @@ public class Dummy extends Combatant
         lookingAtTarget = false;
     }
 
-    public CustomModel getStyleModel()
+    public CustomModel getModel()
     {
-        switch (combatStyle) {
-            case MAGIC:
-                return plugin.magicModel;
-            case RANGE:
-                return plugin.rangeModel;
-            case MELEE:
-                return plugin.meleeModel;
-            default:
-                return plugin.meleeModel;
-
-        }
+        return plugin.currentModel;
     }
 
     public void setCombatStyle(CombatStyle combatStyle)
     {
         log.info("Combat Style Swapped: " + combatStyle);
+        plugin.setCombatStyle(combatStyle);
         this.combatStyle = combatStyle;
     }
 
@@ -454,7 +448,7 @@ public class Dummy extends Combatant
 
         var worldObject = character.getCharacterObject();
 
-        worldObject.setModel(getStyleModel().getModel());
+        worldObject.setModel(getModel().getModel());
 
         var weaponAnimationData = getWeaponAnimationData();
         setWeaponAnimationData(character.getCharacterObject(), weaponAnimationData);
@@ -503,7 +497,7 @@ public class Dummy extends Combatant
 
         plugin.clientThread.invoke(() ->
         {
-            setModel(setupCharacter, getStyleModel());
+            setModel(setupCharacter, getModel());
             setAnimation(setupCharacter, weaponAnimationData != null ? weaponAnimationData.idleID : 808);
             setAnimationFrame(setupCharacter, 0, true);
             setLocation(setupCharacter, !setupCharacter.isLocationSet(), false, setHoveredTile, false);
@@ -784,16 +778,7 @@ public class Dummy extends Combatant
     @Override
     public EquipmentStats getEquipmentStats()
     {
-        switch (combatStyle)
-        {
-            case MAGIC:
-                return plugin.magicGearStats;
-            case MELEE:
-                return plugin.meleeGearStats;
-            case RANGE:
-                return plugin.rangeGearStats;
-        }
-        return plugin.meleeGearStats;
+        return plugin.currentEquipmentStats;
     }
 
     @Override
@@ -805,16 +790,7 @@ public class Dummy extends Combatant
     @Override
     public WeaponData getWeaponData()
     {
-        switch (combatStyle)
-        {
-            case MAGIC:
-                return plugin.magicWeaponData;
-            case MELEE:
-                return plugin.meleeWeaponData;
-            case RANGE:
-                return plugin.rangeWeaponData;
-        }
-        return plugin.meleeWeaponData;
+        return plugin.currentWeaponData;
     }
 
 
@@ -823,11 +799,16 @@ public class Dummy extends Combatant
     {
 
         var weaponData = getWeaponData();
-        var weapon = WeaponUtility.getWeapon(weaponData.getWeaponID());
-        if (weapon != null && weapon.WeaponAnimationData != null)
+        if (weaponData != null)
         {
-            return weapon.WeaponAnimationData;
+            var weapon = WeaponUtility.getWeapon(weaponData.getWeaponID());
+            if (weapon != null && weapon.WeaponAnimationData != null)
+            {
+                return weapon.WeaponAnimationData;
+            }
         }
+
+
 
         return null;
     }

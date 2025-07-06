@@ -1,110 +1,27 @@
-package com.pvpdojo;
-
-import com.pvpdojo.character.datatypes.EquipmentItemGroup;
-import com.pvpdojo.fightPanel.EquipmentItemPanel;
-import net.runelite.api.*;
-import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.PluginPanel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.Point;
-import java.awt.image.BufferedImage;
+import javax.swing.*;
+import javax.swing.border.*;
+import com.jgoodies.forms.factories.*;
+import net.miginfocom.swing.*;
+import org.jdesktop.swingx.*;
+/*
+ * Created by JFormDesigner on Fri Jul 04 11:51:24 EDT 2025
+ */
 
-public class FightSetupPanel extends PluginPanel
+
+
+/**
+ * @author Owner
+ */
+public class Testing extends JPanel
 {
-    private static final Logger log = LoggerFactory.getLogger(FightSetupPanel.class);
-    //private final JPanel panel = new JPanel();
-
-    private final PVPDojoPlugin plugin;
-    private final PVPDojoConfig config;
-
-    @Inject
-    public FightSetupPanel(PVPDojoPlugin plugin, PVPDojoConfig config)
-    {
-        super(false);
-        this.plugin = plugin;
-        this.config = config;
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(ColorScheme.DARK_GRAY_COLOR);
-        setBorder(new EmptyBorder(8, 8, 8, 8));
-/*        JPanel mainContent = new JPanel(new GridLayout(1, 1));
-
-        JButton getGearButton = new JButton("Get Gear");
-        getGearButton.setHorizontalAlignment(SwingConstants.CENTER);
-        getGearButton.setVerticalAlignment(SwingConstants.TOP);
-        getGearButton.setSize(5, 10);
-
-        mainContent.add(getGearButton);*/
-
+    public Testing() {
         initComponents();
-
-
-        //add(mainContent);
-       /* JScrollPane scrollableContainer = new JScrollPane(mainContent);
-        scrollableContainer.setBackground(ColorScheme.DARK_GRAY_COLOR);
-        scrollableContainer.getVerticalScrollBar().setPreferredSize(new Dimension(6, 0));
-
-        scrollableContainer.add(getGearButton);
-
-        add(scrollableContainer);*/
     }
 
-
-    public void rebuild()
-    {
-        SwingUtilities.invokeLater(this::updateUI);
-        repaint();
-        revalidate();
-    }
-    
-    
-    public void addEquipmentItem(EquipmentItemPanel equipmentItem)
-    {
-        equipmentContent.add(equipmentItem);
-    }
-
-
-    public void clearEquippedItems()
-    {
-        equipmentContent.removeAll();
-    }
-
-    public void removeEquippedItem(Component component)
-    {
-        equipmentContent.remove(component);
-    }
-
-    public void equipmentGroupSelected(EquipmentItemGroup group)
-    {
-        plugin.equipmentGroupPressed(group);
-
-        switch (group)
-        {
-            case MELEE:
-                selectedEquipment.setText("MELEE");
-                break;
-            case RANGE:
-                selectedEquipment.setText("RANGE");
-                break;
-            case MAGIC:
-                selectedEquipment.setText("MAGIC");
-                break;
-            case SPEC:
-                selectedEquipment.setText("SPEC");
-                break;
-        }
-    }
-
-    private void initComponents()
-    {
-
+    private void initComponents() {
+        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
+        // Generated using JFormDesigner non-commercial license
         scrollPanel = new JScrollPane();
         contents = new JPanel();
         header = new JLabel();
@@ -181,41 +98,31 @@ public class FightSetupPanel extends PluginPanel
         addEquippedButton = new JButton();
         clearButton = new JButton();
         equipmentListPanel = new JPanel();
+        selectedEquipment = new JLabel();
         equipmentScrollPanel = new JScrollPane();
         equipmentContent = new JPanel();
-        selectedEquipment = new JLabel();
-
-        meleeButton.addActionListener(e -> equipmentGroupSelected(EquipmentItemGroup.MELEE));
-        rangeButton.addActionListener(e -> equipmentGroupSelected(EquipmentItemGroup.RANGE));
-        magicButton.addActionListener(e -> equipmentGroupSelected(EquipmentItemGroup.MAGIC));
-        specButton.addActionListener(e -> equipmentGroupSelected(EquipmentItemGroup.SPEC));
-
-        addEquippedButton.addActionListener(e -> plugin.addEquippedButtonPressed());
-
-        clearButton.addActionListener(e -> plugin.clearButtonPressed());
+        equipmentItem = new JPanel();
+        icon = new JLabel();
+        itemNameLabel = new JLabel();
+        equipmentSlotLabel = new JLabel();
+        removeEquipmentButton = new JButton();
 
         //======== this ========
-        /*setPreferredSize(new Dimension(100, 900));
-
-        setMinimumSize(new Dimension(100, 900));*/
-        //setMaximumSize(new Dimension(100, 160000));
-        setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(100, 743));
+        setMaximumSize(new Dimension(100, 2147483647));
+        setLayout(new CardLayout());
 
         //======== scrollPanel ========
         {
-
-            //scrollPanel.setPreferredSize(new Dimension(100, 1000));
-            //scrollPanel.setBackground(Color.red);
-            //scrollPanel.setPreferredSize(new Dimension(100, plugin.getHeight()));
+            scrollPanel.setMaximumSize(null);
+            scrollPanel.setPreferredSize(null);
 
             //======== contents ========
             {
-                /*
-                contents.setPreferredSize(new Dimension(100, 1200));
-                contents.setMinimumSize(new Dimension(100, 1200));*/
-                contents.setPreferredSize(new Dimension(100, 1100));
+                contents.setMaximumSize(new Dimension(100, 1000));
+                contents.setPreferredSize(new Dimension(100, 800));
+                contents.setMinimumSize(new Dimension(100, 1000));
                 contents.setLayout(new BoxLayout(contents, BoxLayout.Y_AXIS));
-                contents.setBackground(null);
 
                 //---- header ----
                 header.setText("PVP Dojo");
@@ -223,7 +130,9 @@ public class FightSetupPanel extends PluginPanel
                 header.setHorizontalTextPosition(SwingConstants.CENTER);
                 header.setHorizontalAlignment(SwingConstants.CENTER);
                 header.setFont(header.getFont().deriveFont(header.getFont().getStyle() | Font.BOLD, header.getFont().getSize() + 11f));
-                header.setPreferredSize(new Dimension(105, 50));
+                header.setMaximumSize(new Dimension(110, 40));
+                header.setMinimumSize(new Dimension(110, 40));
+                header.setPreferredSize(new Dimension(110, 40));
                 contents.add(header);
 
                 //---- separator1 ----
@@ -942,6 +851,9 @@ public class FightSetupPanel extends PluginPanel
 
                     //======== equipmentOptions ========
                     {
+                        equipmentOptions.setMinimumSize(new Dimension(150, 85));
+                        equipmentOptions.setPreferredSize(new Dimension(150, 85));
+                        equipmentOptions.setMaximumSize(new Dimension(32767, 85));
                         equipmentOptions.setLayout(new FlowLayout());
 
                         //======== optionButtons ========
@@ -973,43 +885,83 @@ public class FightSetupPanel extends PluginPanel
                         equipmentOptions.add(optionButtons);
                     }
                     equipmentPanel.add(equipmentOptions);
-
-                    //======== equipmentListPanel ========
-                    {
-                        equipmentListPanel.setPreferredSize(new Dimension(200, 400));
-                        equipmentListPanel.setLayout(new FlowLayout());
-
-                        //---- selectedEquipment ----
-                        selectedEquipment.setHorizontalAlignment(SwingConstants.CENTER);
-                        selectedEquipment.setText("MELEE");
-                        selectedEquipment.setPreferredSize(new Dimension(66, 15));
-                        equipmentListPanel.add(selectedEquipment);
-
-                        //======== equipmentScrollPanel ========
-                        {
-                            /*equipmentScrollPanel.setMaximumSize(new Dimension(300, 400));
-                            equipmentScrollPanel.setMinimumSize(new Dimension(16, 400));*/
-                            equipmentScrollPanel.setPreferredSize(new Dimension(200, 390));
-                            equipmentScrollPanel.setBorder(LineBorder.createBlackLineBorder());
-
-                            //======== equipmentContent ========
-                            {
-                                equipmentContent.setPreferredSize(new Dimension(195, 50));
-                                equipmentContent.setMaximumSize(new Dimension(195, 390));
-                                equipmentContent.setLayout(new BoxLayout(equipmentContent, BoxLayout.Y_AXIS));
-                                
-                            }
-                            equipmentScrollPanel.setViewportView(equipmentContent);
-                        }
-                        equipmentListPanel.add(equipmentScrollPanel);
-                    }
-                    equipmentPanel.add(equipmentListPanel);
                 }
                 contents.add(equipmentPanel);
+
+                //======== equipmentListPanel ========
+                {
+                    equipmentListPanel.setPreferredSize(new Dimension(200, 400));
+                    equipmentListPanel.setMinimumSize(new Dimension(26, 400));
+                    equipmentListPanel.setLayout(new FlowLayout());
+
+                    //---- selectedEquipment ----
+                    selectedEquipment.setHorizontalAlignment(SwingConstants.CENTER);
+                    selectedEquipment.setText("MELEE");
+                    selectedEquipment.setPreferredSize(new Dimension(66, 15));
+                    equipmentListPanel.add(selectedEquipment);
+
+                    //======== equipmentScrollPanel ========
+                    {
+                        equipmentScrollPanel.setMaximumSize(new Dimension(300, 400));
+                        equipmentScrollPanel.setMinimumSize(new Dimension(16, 400));
+                        equipmentScrollPanel.setPreferredSize(new Dimension(200, 400));
+                        equipmentScrollPanel.setBorder(LineBorder.createBlackLineBorder());
+
+                        //======== equipmentContent ========
+                        {
+                            equipmentContent.setPreferredSize(new Dimension(195, 35));
+                            equipmentContent.setMaximumSize(new Dimension(195, 35));
+                            equipmentContent.setMinimumSize(new Dimension(198, 35));
+                            equipmentContent.setLayout(new BoxLayout(equipmentContent, BoxLayout.Y_AXIS));
+
+                            //======== equipmentItem ========
+                            {
+                                equipmentItem.setPreferredSize(new Dimension(395, 60));
+                                equipmentItem.setBorder(LineBorder.createGrayLineBorder());
+                                equipmentItem.setBackground(new Color(0x333333));
+                                equipmentItem.setMaximumSize(new Dimension(395, 35));
+                                equipmentItem.setLayout(null);
+
+                                //---- icon ----
+                                icon.setIcon(new ImageIcon(getClass().getResource("/skull_blue.png")));
+                                icon.setHorizontalTextPosition(SwingConstants.CENTER);
+                                icon.setHorizontalAlignment(SwingConstants.CENTER);
+                                equipmentItem.add(icon);
+                                icon.setBounds(5, 5, 25, 25);
+
+                                //---- itemNameLabel ----
+                                itemNameLabel.setText("Dragon Scimitar");
+                                itemNameLabel.setFont(new Font("Inter", Font.PLAIN, 11));
+                                equipmentItem.add(itemNameLabel);
+                                itemNameLabel.setBounds(new Rectangle(new Point(35, 5), itemNameLabel.getPreferredSize()));
+
+                                //---- equipmentSlotLabel ----
+                                equipmentSlotLabel.setText("Main-Hand");
+                                equipmentSlotLabel.setFont(new Font("Inter", Font.PLAIN, 8));
+                                equipmentSlotLabel.setForeground(new Color(0x999999));
+                                equipmentSlotLabel.setHorizontalAlignment(SwingConstants.LEFT);
+                                equipmentItem.add(equipmentSlotLabel);
+                                equipmentSlotLabel.setBounds(35, 18, 99, 12);
+
+                                //---- removeEquipmentButton ----
+                                removeEquipmentButton.setText("-");
+                                removeEquipmentButton.setPreferredSize(new Dimension(20, 20));
+                                removeEquipmentButton.setBorder(new LineBorder(Color.red));
+                                removeEquipmentButton.setForeground(Color.red);
+                                equipmentItem.add(removeEquipmentButton);
+                                removeEquipmentButton.setBounds(new Rectangle(new Point(170, 7), removeEquipmentButton.getPreferredSize()));
+                            }
+                            equipmentContent.add(equipmentItem);
+                        }
+                        equipmentScrollPanel.setViewportView(equipmentContent);
+                    }
+                    equipmentListPanel.add(equipmentScrollPanel);
+                }
+                contents.add(equipmentListPanel);
             }
             scrollPanel.setViewportView(contents);
         }
-        add(scrollPanel, BorderLayout.CENTER);
+        add(scrollPanel, "card1");
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
@@ -1091,9 +1043,13 @@ public class FightSetupPanel extends PluginPanel
     private JButton addEquippedButton;
     private JButton clearButton;
     private JPanel equipmentListPanel;
+    private JLabel selectedEquipment;
     private JScrollPane equipmentScrollPanel;
     private JPanel equipmentContent;
-    private JLabel selectedEquipment;
-
-
+    private JPanel equipmentItem;
+    private JLabel icon;
+    private JLabel itemNameLabel;
+    private JLabel equipmentSlotLabel;
+    private JButton removeEquipmentButton;
+    // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

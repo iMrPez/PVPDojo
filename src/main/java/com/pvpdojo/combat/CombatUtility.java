@@ -1,6 +1,7 @@
 package com.pvpdojo.combat;
 
 import com.pvpdojo.*;
+import com.pvpdojo.character.datatypes.EquipmentData;
 import com.pvpdojo.character.datatypes.WeaponData;
 import com.pvpdojo.combat.equipment.EquipmentStats;
 import com.pvpdojo.combat.equipment.EquipmentUtility;
@@ -121,6 +122,7 @@ public class CombatUtility
                 WEAPON_SPEED
         );
     }
+
 
 
     public WeaponData getWeaponData()

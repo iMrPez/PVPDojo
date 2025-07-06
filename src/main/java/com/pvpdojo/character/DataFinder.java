@@ -10,6 +10,8 @@ import net.runelite.api.*;
 import net.runelite.api.kit.KitType;
 import okhttp3.*;
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -26,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 @Getter
 public class DataFinder
 {
+
+    private static final Logger log = LoggerFactory.getLogger(DataFinder.class);
 
     public enum DataType
     {
@@ -236,6 +240,363 @@ public class DataFinder
         });
     }
 
+    public ItemData getItemData(int itemID)
+    {
+        for (ItemData item : itemData)
+        {
+            if (itemID == item.getId())
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+
+    public ModelStats[] findModels(boolean maleItem, int[] items, int[] colors)
+    {
+        //Convert equipmentId to itemId or kitId as appropriate
+        int[] ids = new int[items.length];
+
+        int[] itemShortList = new int[items.length];
+        int[] kitShortList = new int[items.length];
+
+        for (int i = 0; i < ids.length; i++)
+        {
+            int item = items[i];
+
+            if (item >= PlayerComposition.KIT_OFFSET && item <= PlayerComposition.ITEM_OFFSET)
+            {
+                kitShortList[i] = item - PlayerComposition.KIT_OFFSET;
+            }
+            else
+            {
+                kitShortList[i] = -1;
+            }
+
+            if (item > PlayerComposition.ITEM_OFFSET)
+            {
+                itemShortList[i] = item - PlayerComposition.ITEM_OFFSET;
+            }
+            else
+            {
+                itemShortList[i] = -1;
+            }
+        }
+
+        AnimSequence animSequence = new AnimSequence(
+                AnimSequenceData.UNALTERED,
+                AnimSequenceData.UNALTERED,
+                -1,
+                -1);
+
+        /*if (animId != -1)
+        {
+            removePlayerItems(animSequence, animId);
+        }*/
+
+        //for ItemIds
+        ArrayList<ModelStats> itemArray = new ArrayList<>();
+        getItems(itemArray, maleItem, itemShortList, animSequence, colors);
+
+        //for KitIds
+        ArrayList<ModelStats> kitArray = new ArrayList<>();
+        getPlayerKit(kitArray, kitShortList);
+
+        ArrayList<ModelStats> spotAnimArray = new ArrayList<>();
+        /*if (spotAnims.length > 0)
+        {
+            getPlayerSpotAnims(spotAnims, spotAnimArray);
+        }*/
+
+        itemArray.addAll(kitArray);
+        itemArray.addAll(spotAnimArray);
+        ArrayList<ModelStats> orderedItems = new ArrayList<>();
+        for (int e = 0; e < bodyParts.length; e++)
+        {
+            for (int i = 0; i < itemArray.size(); i++)
+            {
+                ModelStats modelStats = itemArray.get(i);
+                if (modelStats.getBodyPart() == bodyParts[e])
+                {
+                    if (!orderedItems.contains(modelStats))
+                    {
+                        orderedItems.add(modelStats);
+                    }
+                }
+            }
+        }
+
+        return orderedItems.toArray(new ModelStats[0]);
+    }
+
+    public void getItems(ArrayList<ModelStats> modelStats, boolean maleItem, int[] itemId, AnimSequence animSequence, int[] colors)
+    {
+        AnimSequenceData mainHand = animSequence.getMainHandData();
+        AnimSequenceData offHand = animSequence.getOffHandData();
+
+        int[] updatedItemIds = Arrays.copyOf(itemId, itemId.length);
+
+        switch (mainHand)
+        {
+            case UNALTERED:
+                switch (offHand)
+                {
+                    case UNALTERED:
+                        break;
+                    case HIDE:
+                        updatedItemIds[SHIELD_IDX] = -1;
+                        break;
+                    case SWAP:
+                        updatedItemIds[SHIELD_IDX] = animSequence.getOffHandItemId();
+                }
+                break;
+            case SWAP:
+                switch (offHand)
+                {
+                    case UNALTERED:
+                        updatedItemIds[WEAPON_IDX] = animSequence.getMainHandItemId();
+                        break;
+                    case HIDE:
+                        updatedItemIds[WEAPON_IDX] = -1;
+                        updatedItemIds[SHIELD_IDX] = animSequence.getMainHandItemId();
+                        break;
+                    case SWAP:
+                        updatedItemIds[SHIELD_IDX] = animSequence.getMainHandItemId();
+                        updatedItemIds[WEAPON_IDX] = animSequence.getOffHandItemId();
+                }
+                break;
+            case HIDE:
+                switch (offHand)
+                {
+                    case UNALTERED:
+                        updatedItemIds[WEAPON_IDX] = -1;
+                        break;
+                    case HIDE:
+                        updatedItemIds[WEAPON_IDX] = -1;
+                        updatedItemIds[SHIELD_IDX] = -1;
+                        break;
+                    case SWAP:
+                        updatedItemIds[WEAPON_IDX] = animSequence.getOffHandItemId();
+                        updatedItemIds[SHIELD_IDX] = -1;
+                }
+                break;
+        }
+
+        int itemsToComplete = updatedItemIds.length;
+        for (int i : updatedItemIds)
+        {
+            if (i == -1)
+            {
+                itemsToComplete--;
+            }
+        }
+
+        for (ItemData itemDatum : itemData)
+        {
+            if (itemsToComplete == 0)
+            {
+                break;
+            }
+
+            for (int i = 0; i < updatedItemIds.length; i++)
+            {
+                int item = updatedItemIds[i];
+                if (item == -1)
+                {
+                    continue;
+                }
+
+                if (itemDatum.getId() == item)
+                {
+                    itemsToComplete--;
+                    int[] modelIds = new int[0];
+                    int offset = 0;
+
+                    if (maleItem)
+                    {
+                        modelIds = ArrayUtils.addAll(modelIds, itemDatum.getMaleModel0(), itemDatum.getMaleModel1(), itemDatum.getMaleModel2());
+                        offset = itemDatum.getMaleOffset();
+                    }
+                    else
+                    {
+                        modelIds = ArrayUtils.addAll(modelIds, itemDatum.getFemaleModel0(), itemDatum.getFemaleModel1(), itemDatum.getFemaleModel2());
+                        offset = itemDatum.getFemaleOffset();
+                    }
+
+                    short[] rf = new short[0];
+                    short[] rt = new short[0];
+
+                    if (itemDatum.getColorReplace() != null)
+                    {
+                        int[] recolorToReplace = itemDatum.getColorReplace();
+                        int[] recolorToFind = itemDatum.getColorFind();
+                        rf = new short[recolorToReplace.length];
+                        rt = new short[recolorToReplace.length];
+
+                        for (int e = 0; e < rf.length; e++)
+                        {
+                            int rfi = recolorToFind[e];
+                            if (rfi > 32767)
+                            {
+                                rfi -= 65536;
+                            }
+                            rf[e] = (short) rfi;
+
+                            int rti = recolorToReplace[e];
+                            if (rti > 32767)
+                            {
+                                rti -= 65536;
+                            }
+                            rt[e] = (short) rti;
+                        }
+                    }
+
+                    short[] rtFrom = new short[0];
+                    short[] rtTo = new short[0];
+
+                    if (itemDatum.getTextureReplace() != null)
+                    {
+                        int[] textureToReplace = itemDatum.getTextureReplace();
+                        int[] retextureToFind = itemDatum.getTextureFind();
+                        rtFrom = new short[textureToReplace.length];
+                        rtTo = new short[textureToReplace.length];
+
+                        for (int e = 0; e < rtFrom.length; e++)
+                        {
+                            rtFrom[e] = (short) retextureToFind[e];
+                            rtTo[e] = (short) textureToReplace[e];
+                        }
+                    }
+
+                    LightingStyle ls = LightingStyle.ACTOR;
+                    CustomLighting customLighting = new CustomLighting(
+                            ls.getAmbient(),
+                            ls.getContrast(),
+                            ls.getX(),
+                            ls.getY(),
+                            ls.getZ());
+
+                    for (int id : modelIds)
+                    {
+                        if (id != -1)
+                        {
+                            modelStats.add(new ModelStats(
+                                    id,
+                                    bodyParts[i],
+                                    rf,
+                                    rt,
+                                    rtFrom,
+                                    rtTo,
+                                    itemDatum.getResizeX(),
+                                    itemDatum.getResizeZ(),
+                                    itemDatum.getResizeY(),
+                                    offset * -1,
+                                    customLighting
+                            ));
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    public void getKit(ArrayList<ModelStats> modelStats, int[] kitId, int[] colors)
+    {
+        int itemsToComplete = kitId.length;
+        for (int i : kitId)
+        {
+            if (i == -1)
+            {
+                itemsToComplete--;
+            }
+        }
+
+        for (KitData kitData : kitData)
+        {
+            if (itemsToComplete == 0)
+            {
+                break;
+            }
+
+            for (int i = 0; i < kitId.length; i++)
+            {
+                int item = kitId[i];
+                if (item == -1)
+                {
+                    continue;
+                }
+
+                if (kitData.getId() == item)
+                {
+                    itemsToComplete--;
+                    int[] modelIds = kitData.getModels();
+
+                    short[] rf = new short[0];
+                    short[] rt = new short[0];
+
+                    if (kitData.getRecolorToReplace() != null)
+                    {
+                        int[] recolorToReplace = kitData.getRecolorToReplace();
+                        int[] recolorToFind = kitData.getRecolorToFind();
+                        rf = new short[recolorToReplace.length];
+                        rt = new short[recolorToReplace.length];
+
+                        for (int e = 0; e < rf.length; e++)
+                        {
+                            int rfi = recolorToFind[e];
+                            if (rfi > 32767)
+                            {
+                                rfi -= 65536;
+                            }
+                            rf[e] = (short) rfi;
+
+                            int rti = recolorToReplace[e];
+                            if (rti > 32767)
+                            {
+                                rti -= 65536;
+                            }
+                            rt[e] = (short) rti;
+                        }
+                    }
+
+                    LightingStyle ls = LightingStyle.ACTOR;
+                    CustomLighting customLighting = new CustomLighting(
+                            ls.getAmbient(),
+                            ls.getContrast(),
+                            ls.getX(),
+                            ls.getY(),
+                            ls.getZ());
+
+                    for (int id : modelIds)
+                    {
+                        if (id != -1)
+                        {
+                            modelStats.add(new ModelStats(
+                                    id,
+                                    bodyParts[i],
+                                    rf,
+                                    rt,
+                                    new short[0],
+                                    new short[0],
+                                    128,
+                                    128,
+                                    128,
+                                    0,
+                                    customLighting
+                            ));
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
     public ModelStats[] findModelsForPlayer(boolean groundItem, boolean maleItem, int[] items, int animId, int[] spotAnims)
     {
         //Convert equipmentId to itemId or kitId as appropriate
@@ -273,10 +634,10 @@ public class DataFinder
                 -1,
                 -1);
 
-        if (animId != -1)
+        /*if (animId != -1)
         {
             removePlayerItems(animSequence, animId);
-        }
+        }*/
 
         //for ItemIds
         ArrayList<ModelStats> itemArray = new ArrayList<>();
@@ -287,10 +648,10 @@ public class DataFinder
         getPlayerKit(kitArray, kitShortList);
 
         ArrayList<ModelStats> spotAnimArray = new ArrayList<>();
-        if (spotAnims.length > 0)
+        /*if (spotAnims.length > 0)
         {
             getPlayerSpotAnims(spotAnims, spotAnimArray);
-        }
+        }*/
 
         itemArray.addAll(kitArray);
         itemArray.addAll(spotAnimArray);

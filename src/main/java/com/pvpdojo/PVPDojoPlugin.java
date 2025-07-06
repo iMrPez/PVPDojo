@@ -12,19 +12,17 @@ import javax.inject.Inject;
 import javax.swing.*;
 
 import com.pvpdojo.character.*;
-import com.pvpdojo.character.datatypes.Coordinate;
-import com.pvpdojo.character.datatypes.WeaponData;
+import com.pvpdojo.character.datatypes.*;
+import com.pvpdojo.combat.CombatStyle;
 import com.pvpdojo.combat.CombatUtility;
 import com.pvpdojo.combat.equipment.EquipmentStats;
 import com.pvpdojo.combat.equipment.EquipmentUtility;
 import com.pvpdojo.combat.Prayers;
 import com.pvpdojo.combatant.CorePlayer;
 import com.pvpdojo.combatant.Dummy;
+import com.pvpdojo.fightPanel.EquipmentItemPanel;
 import com.pvpdojo.overlays.*;
-import com.pvpdojo.pathfinding.MovementType;
 import com.pvpdojo.pathfinding.PathFinder;
-import com.pvpdojo.program.Program;
-import com.pvpdojo.program.ProgramComp;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -67,10 +65,10 @@ public class PVPDojoPlugin extends Plugin
 	public PVPDojoConfig config;
 
 	@Inject
-	private DataFinder dataFinder;
+	private ModelGetter modelGetter;
 
 	@Inject
-	private ModelGetter modelGetter;
+	private ConfigManager configManager;
 
 	@Inject
 	public OverheadOverlay overheadOverlay;
@@ -117,7 +115,7 @@ public class PVPDojoPlugin extends Plugin
 	private NavigationButton navButton;
 	private boolean hasDummySpawned = false;
 
-	private FightSetupPanel panel;
+	private FightSetupPanel fightPanel;
 
 	@Override
 	protected void startUp() throws Exception
@@ -133,24 +131,37 @@ public class PVPDojoPlugin extends Plugin
 		overlayManager.add(fightOverlay);
 		overlayManager.add(prayerOverlay);
 
-		panel = injector.getInstance(FightSetupPanel.class);
+		fightPanel = injector.getInstance(FightSetupPanel.class);
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/skull_blue.png");
 		navButton = NavigationButton.builder()
 				.tooltip("PvP Fight History")
 				.icon(icon)
 				.priority(6)
-				.panel(panel)
+				.panel(fightPanel)
 				.build();
 
 
 		clientToolbar.addNavigation(navButton);
 
 
+
 		// Explicitly rebuild panel after all setup and import.
 		SwingUtilities.invokeLater(() ->
 		{
-			if (panel != null) {
-				panel.rebuild();
+			if (fightPanel != null)
+			{
+				var loadData = PVPDojoData.loadData(configManager);
+				if (loadData != null)
+				{
+					meleeEquipmentData = loadData.meleeEquipmentData;
+					rangeEquipmentData = loadData.rangeEquipmentData;
+					magicEquipmentData = loadData.magicEquipmentData;
+					specEquipmentData = loadData.specEquipmentData;
+
+					equipmentGroupPressed(EquipmentItemGroup.MELEE);
+				}
+
+				fightPanel.rebuild();
 			}
 		});
 	}
@@ -178,27 +189,45 @@ public class PVPDojoPlugin extends Plugin
 		isActive = false;
 		dummy = null;
 
+		var saveData = new PVPDojoData(meleeEquipmentData, rangeEquipmentData, magicEquipmentData, specEquipmentData);
+
+		PVPDojoData.saveData(configManager, saveData);
+
 	}
 
 	private boolean isActive = false;
 
 	public Dummy dummy;
 
-	public CustomModel magicModel;
-	public CustomModel rangeModel;
-	public CustomModel meleeModel;
+	public CustomModel currentModel;
+	public EquipmentStats currentEquipmentStats;
+	public WeaponData currentWeaponData;
 
-	public EquipmentStats magicGearStats;
+	public EquipmentItemGroup selectedEquipmentGroup = EquipmentItemGroup.MELEE;
+
+	public EquipmentData meleeEquipmentData;
+
+	public EquipmentData rangeEquipmentData;
+
+	public EquipmentData magicEquipmentData;
+
+	public EquipmentData specEquipmentData;
+
+	/*public CustomModel magicModel;
+	public CustomModel rangeModel;
+	public CustomModel meleeModel;*/
+
+	/*public EquipmentStats magicGearStats;
 	public EquipmentStats rangeGearStats;
 	public EquipmentStats meleeGearStats;
 
 	public WeaponData magicWeaponData;
 	public WeaponData rangeWeaponData;
-	public WeaponData meleeWeaponData;
+	public WeaponData meleeWeaponData;*/
 
-	private boolean isSettingMagicGear = false;
+/*	private boolean isSettingMagicGear = false;
 	private boolean isSettingRangeGear = false;
-	private boolean isSettingMeleeGear = false;
+	private boolean isSettingMeleeGear = false;*/
 
 	private int ticks = 0;
 
@@ -218,6 +247,9 @@ public class PVPDojoPlugin extends Plugin
 	public int totalOffPrayerHitsOnPlayer = 0;
 
 	public List<Prayers> requestedPrayers = new ArrayList<>();
+
+	private EquipmentItemData newlyAddedEquipmentItem;
+
 
 	public boolean hasStartedFightCountdown()
 	{
@@ -311,6 +343,66 @@ public class PVPDojoPlugin extends Plugin
 	@Subscribe
 	public void onClientTick(ClientTick event)
 	{
+		/*var clientHeight = fightPanel.getPreferredHeight();
+		log.info("" + clientHeight);
+		if (lastHeight != clientHeight)
+		{
+			lastHeight = clientHeight;
+			fightPanel.setScrollViewHeight(clientHeight - 30);
+			fightPanel.rebuild();
+			log.info("Updated UI Height: " + clientHeight);
+		}
+*/
+
+		/*if (newlyAddedEquipmentItem != null)
+		{
+			switch (selectedEquipmentGroup)
+			{
+                case MELEE:
+					if (meleeEquipmentData != null)
+					{
+						meleeEquipmentData.equipmentList.add(newlyAddedEquipmentItem);
+					}
+					else
+					{
+						meleeEquipmentData = new EquipmentData(List.of(newlyAddedEquipmentItem));
+					}
+                    break;
+                case RANGE:
+					if (rangeEquipmentData != null)
+					{
+						rangeEquipmentData.equipmentList.add(newlyAddedEquipmentItem);
+					}
+					else
+					{
+						rangeEquipmentData = new EquipmentData(List.of(newlyAddedEquipmentItem));
+					}
+                    break;
+                case MAGIC:
+					if (magicEquipmentData != null)
+					{
+						magicEquipmentData.equipmentList.add(newlyAddedEquipmentItem);
+					}
+					else
+					{
+						magicEquipmentData = new EquipmentData(List.of(newlyAddedEquipmentItem));
+					}
+                    break;
+                case SPEC:
+					if (specEquipmentData != null)
+					{
+						specEquipmentData.equipmentList.add(newlyAddedEquipmentItem);
+					}
+					else
+					{
+						specEquipmentData = new EquipmentData(List.of(newlyAddedEquipmentItem));
+					}
+                    break;
+            }
+
+			newlyAddedEquipmentItem = null;
+		}*/
+
 		if (client.getGameState() != GameState.LOGGED_IN)
 			return;
 
@@ -339,6 +431,7 @@ public class PVPDojoPlugin extends Plugin
 	}
 
 
+
 	private void despawnDummy()
 	{
 		dummy.despawnCharacter();
@@ -359,26 +452,132 @@ public class PVPDojoPlugin extends Plugin
 
 	private void setMeleeGear()
 	{
-		isSettingMeleeGear = true;
-		modelGetter.storePlayer(client.getLocalPlayer(), true);
-		meleeGearStats = combatUtility.getEquipmentStats();
-		meleeWeaponData = combatUtility.getWeaponData();
+		meleeEquipmentData = new EquipmentData(getEquippedItemData());
+		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Melee Gear Set", "Dummy");
 	}
 
 	private void setRangeGear() {
 
-		isSettingRangeGear = true;
-		modelGetter.storePlayer(client.getLocalPlayer(), true);
-		rangeGearStats = combatUtility.getEquipmentStats();
-		rangeWeaponData = combatUtility.getWeaponData();
+		rangeEquipmentData = new EquipmentData(getEquippedItemData());
+		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Range Gear Set", "Dummy");
 	}
 
 	private void setMagicGear()
 	{
+		/*var player = client.getLocalPlayer();
+		PlayerComposition comp = player.getPlayerComposition();
+		var modelStats = modelGetter.getModelStats(comp);*/
+
+		/*var equippedItems = new EquipmentData(getEquippedItemData());
+		var defaultItems = EquipmentData.getDefault();
+		defaultItems.replace(equippedItems.getWeapon());
+		var modelStats = defaultItems.getModelStats();
+		log.info("EquipmentList: " + equippedItems.equipmentList.size());
+		log.info("ModelStats: " + modelStats.length);
 		isSettingMagicGear = true;
+		modelGetter.storeModelStats(modelStats);
+		magicGearStats = equippedItems.getEquipmentStats(itemManager);
+		magicWeaponData = combatUtility.getWeaponData();*/
+
+		/*isSettingMagicGear = true;
 		modelGetter.storePlayer(client.getLocalPlayer(), true);
 		magicGearStats = combatUtility.getEquipmentStats();
-		magicWeaponData = combatUtility.getWeaponData();
+		magicWeaponData = combatUtility.getWeaponData();*/
+
+		magicEquipmentData = new EquipmentData(getEquippedItemData());
+		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Magic Gear Set", "Dummy");
+	}
+
+
+	public List<EquipmentItemData> getEquippedItemData()
+	{
+		List<EquipmentItemData> equipmentItemData = new ArrayList<>(List.of());
+
+		for (BodyPart bodyPart : BodyPart.values())
+		{
+			switch (bodyPart)
+			{
+                case NA:
+                    break;
+                case HEAD:
+					var headStat = modelGetter.getModelStat(BodyPart.HEAD);
+					var headItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.HEAD);
+					EquipmentItemData headItemData = new EquipmentItemData(headItem != null ? headItem.getId() : -1, EquipmentInventorySlot.HEAD, null, headStat);
+					equipmentItemData.add(headItemData);
+                    break;
+                case CAPE:
+					var capeStat = modelGetter.getModelStat(BodyPart.CAPE);
+					var capeItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.CAPE);
+					EquipmentItemData capeItemData = new EquipmentItemData(capeItem != null ? capeItem.getId() : -1, EquipmentInventorySlot.CAPE, null, capeStat);
+					equipmentItemData.add(capeItemData);
+                    break;
+                case AMULET:
+					var amuletStat = modelGetter.getModelStat(BodyPart.AMULET);
+					var amuletItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.AMULET);
+					EquipmentItemData amuletItemData = new EquipmentItemData(amuletItem != null ? amuletItem.getId() : -1, EquipmentInventorySlot.AMULET, null, amuletStat);
+					equipmentItemData.add(amuletItemData);
+                    break;
+                case WEAPON:
+					var weaponStat = modelGetter.getModelStat(BodyPart.WEAPON);
+					var weaponItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.WEAPON);
+					var weaponData = combatUtility.getWeaponData();
+					EquipmentItemData weaponItemData = new EquipmentItemData(weaponItem != null ? weaponItem.getId() : -1, EquipmentInventorySlot.WEAPON, weaponData, weaponStat);
+					equipmentItemData.add(weaponItemData);
+                    break;
+                case TORSO:
+					var torsoStat = modelGetter.getModelStat(BodyPart.TORSO);
+					var torsoItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.BODY);
+					EquipmentItemData torsoItemData = new EquipmentItemData(torsoItem != null ? torsoItem.getId() : -1, EquipmentInventorySlot.BODY, null, torsoStat);
+					equipmentItemData.add(torsoItemData);
+                    break;
+                case SHIELD:
+					var shieldStat = modelGetter.getModelStat(BodyPart.SHIELD);
+					var shieldItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.SHIELD);
+					EquipmentItemData shieldItemData = new EquipmentItemData(shieldItem != null ? shieldItem.getId() : -1, EquipmentInventorySlot.SHIELD, null, shieldStat);
+					equipmentItemData.add(shieldItemData);
+                    break;
+                case ARMS:
+					var armsStat = modelGetter.getModelStat(BodyPart.ARMS);
+					var armsItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.ARMS);
+					EquipmentItemData armsItemData = new EquipmentItemData(armsItem != null ? armsItem.getId() : -1, EquipmentInventorySlot.ARMS, null, armsStat);
+					equipmentItemData.add(armsItemData);
+                    break;
+                case LEGS:
+					var legsStat = modelGetter.getModelStat(BodyPart.LEGS);
+					var legsItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.LEGS);
+					EquipmentItemData legsItemData = new EquipmentItemData(legsItem != null ? legsItem.getId() : -1, EquipmentInventorySlot.LEGS, null, legsStat);
+					equipmentItemData.add(legsItemData);
+                    break;
+                case HAIR:
+					var hairStat = modelGetter.getModelStat(BodyPart.HAIR);
+					var hairItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.HAIR);
+					EquipmentItemData hairItemData = new EquipmentItemData(hairItem != null ? hairItem.getId() : -1, EquipmentInventorySlot.HAIR, null, hairStat);
+					equipmentItemData.add(hairItemData);
+                    break;
+                case HANDS:
+					var handsStat = modelGetter.getModelStat(BodyPart.HANDS);
+					var handsItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.GLOVES);
+					EquipmentItemData handsItemData = new EquipmentItemData(handsItem != null ? handsItem.getId() : -1, EquipmentInventorySlot.GLOVES, null, handsStat);
+					equipmentItemData.add(handsItemData);
+                    break;
+                case FEET:
+					var feetStat = modelGetter.getModelStat(BodyPart.FEET);
+					var feetItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.BOOTS);
+					EquipmentItemData feetItemData = new EquipmentItemData(feetItem != null ? feetItem.getId() : -1, EquipmentInventorySlot.BOOTS, null, feetStat);
+					equipmentItemData.add(feetItemData);
+                    break;
+                case JAW:
+					var jawStat = modelGetter.getModelStat(BodyPart.JAW);
+					var jawItem = EquipmentUtility.getSlot(client, EquipmentInventorySlot.JAW);
+					EquipmentItemData jawItemData = new EquipmentItemData(jawItem != null ? jawItem.getId() : -1, EquipmentInventorySlot.JAW, null, jawStat);
+					equipmentItemData.add(jawItemData);
+                    break;
+                case SPOTANIM:
+                    break;
+            }
+		}
+
+		return equipmentItemData;
 	}
 
 	public void startFight()
@@ -425,8 +624,9 @@ public class PVPDojoPlugin extends Plugin
 	}
 
 
-	private boolean canActivate() {
-		return magicModel != null && rangeModel != null && meleeModel != null;
+	private boolean canActivate()
+	{
+		return magicEquipmentData != null && rangeEquipmentData != null && meleeEquipmentData != null;
 	}
 
 
@@ -435,102 +635,8 @@ public class PVPDojoPlugin extends Plugin
 		return ticks;
 	}
 
-	public Model constructModelFromCache(ModelStats[] modelStatsArray, int[] kitRecolours, boolean player, LightingStyle ls, CustomLighting cl)
-	{
-		ModelData md = constructModelDataFromCache(modelStatsArray, kitRecolours, player);
-		if (ls == LightingStyle.CUSTOM)
-		{
-			return client.mergeModels(md).light(cl.getAmbient(), cl.getContrast(), cl.getX(), -cl.getZ(), cl.getY());
-		}
-
-		return client.mergeModels(md).light(ls.getAmbient(), ls.getContrast(), ls.getX(), -ls.getZ(), ls.getY());
-	}
-
-	public ModelData constructModelDataFromCache(ModelStats[] modelStatsArray, int[] kitRecolours, boolean player)
-	{
-		ModelData[] mds = new ModelData[modelStatsArray.length];
-
-		for (int i = 0; i < modelStatsArray.length; i++)
-		{
-			ModelStats modelStats = modelStatsArray[i];
-			ModelData modelData = client.loadModelData(modelStats.getModelId());
-
-			if (modelData == null)
-				continue;
-
-			modelData.cloneColors().cloneVertices();
-
-			for (short s = 0; s < modelStats.getRecolourFrom().length; s++)
-				modelData.recolor(modelStats.getRecolourFrom()[s], modelStats.getRecolourTo()[s]);
-
-			if (player)
-				KitRecolourer.recolourKitModel(modelData, modelStats.getBodyPart(), kitRecolours);
-
-			short[] textureFrom = modelStats.getTextureFrom();
-			short[] textureTo = modelStats.getTextureTo();
-
-			if (textureFrom == null || textureTo == null)
-			{
-				modelStats.setTextureFrom(new short[0]);
-				modelStats.setTextureTo(new short[0]);
-			}
-
-			textureFrom = modelStats.getTextureFrom();
-			textureTo = modelStats.getTextureTo();
-
-			if (textureFrom.length > 0 && textureTo.length > 0)
-			{
-				for (int e = 0; e < textureFrom.length; e++)
-				{
-					modelData.retexture(textureFrom[e], textureTo[e]);
-				}
-			}
-
-			if (modelStats.getResizeX() == 0 && modelStats.getResizeY() == 0 && modelStats.getResizeZ() == 0)
-			{
-				modelStats.setResizeX(128);
-				modelStats.setResizeY(128);
-				modelStats.setResizeZ(128);
-			}
-
-			modelData.scale(modelStats.getResizeX(), modelStats.getResizeZ(), modelStats.getResizeY());
-
-			modelData.translate(0, -1 * modelStats.getTranslateZ(), 0);
-
-			mds[i] = modelData;
-		}
-
-		return client.mergeModels(mds);
-	}
 
 
-
-	public void addCustomModel(CustomModel customModel)
-	{
-		if (isSettingMagicGear)
-		{
-			magicModel = customModel;
-
-			isSettingMagicGear = false;
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Magic Model Set", "Dummy");
-		}
-
-		if (isSettingRangeGear)
-		{
-			rangeModel = customModel;
-
-			isSettingRangeGear = false;
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Range Model Set", "Dummy");
-		}
-
-		if (isSettingMeleeGear)
-		{
-			meleeModel = customModel;
-
-			isSettingMeleeGear = false;
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Dummy", "Melee Model Set", "Dummy");
-		}
-	}
 
 	@Subscribe
 	public void onPostMenuSort(PostMenuSort event)
@@ -568,7 +674,7 @@ public class PVPDojoPlugin extends Plugin
 
 	private void handlePrayerMenuEntries()
 	{
-		/*if (!hasDummySpawned) return;*/
+		if (!hasDummySpawned) return;
 
 		MenuEntry[] menuEntries = client.getMenu().getMenuEntries();
 		for (MenuEntry menuEntry : menuEntries)
@@ -706,27 +812,6 @@ public class PVPDojoPlugin extends Plugin
 					.onClick(e -> {spawnDummy();});
 		}
 
-		if (hasDummySpawned) return;
-
-		MenuEntry setMagicGearEntry = client.getMenu().createMenuEntry(1)
-				.setOption(ColorUtil.prependColorTag("Set", Color.white))
-				.setTarget(ColorUtil.colorTag(Color.blue) + "Magic Gear " + (magicModel != null ? "(X)" : ""))
-				.setType(MenuAction.RUNELITE)
-				.onClick(e -> {setMagicGear();});
-
-		MenuEntry setRangeGearEntry = client.getMenu().createMenuEntry(2)
-				.setOption(ColorUtil.prependColorTag("Set", Color.white))
-				.setTarget(ColorUtil.colorTag(Color.green) + "Range Gear" + (rangeModel != null ? "(X)" : ""))
-				.setType(MenuAction.RUNELITE)
-				.onClick(e -> {setRangeGear();});
-
-		MenuEntry setMeleeGearEntry = client.getMenu().createMenuEntry(3)
-				.setOption(ColorUtil.prependColorTag("Set", Color.white))
-				.setTarget(ColorUtil.colorTag(Color.red) + "Melee Gear" + (meleeModel != null ? "(X)" : ""))
-				.setType(MenuAction.RUNELITE)
-				.onClick(e -> {setMeleeGear();});
-
-
 	}
 
 	public boolean addCharacterMenuEntries(Tile tile)
@@ -829,17 +914,212 @@ public class PVPDojoPlugin extends Plugin
 				.onClick(e -> stopFight(false));
 	}
 
-	public Program createEmptyProgram(int poseAnim, int walkAnim)
-	{
-		Color color = new Color(255, 255, 255);
-		ProgramComp comp = new ProgramComp(new WorldPoint[0], new WorldPoint[0], new LocalPoint[0], new LocalPoint[0], new Coordinate[0], false, 0, 1, 25, poseAnim, walkAnim, MovementType.NORMAL, color.getRGB(), false, false);
-		return new Program(comp, color);
-	}
-
-
 	@Provides
 	PVPDojoConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(PVPDojoConfig.class);
 	}
+
+	public EquipmentData getEquipmentData(EquipmentItemGroup group)
+	{
+		switch (group)
+		{
+            case MELEE:
+				return meleeEquipmentData;
+            case RANGE:
+                return rangeEquipmentData;
+            case MAGIC:
+                return magicEquipmentData;
+            case SPEC:
+                return specEquipmentData;
+			default:
+				return meleeEquipmentData;
+        }
+	}
+
+	public void setSelectedEquipmentGroup(EquipmentItemGroup group)
+	{
+		selectedEquipmentGroup = group;
+
+		loadFromEquipmentData(getEquipmentData(group));
+	}
+
+	public void loadFromEquipmentData(EquipmentData equipmentData)
+	{
+		fightPanel.clearEquippedItems();
+
+		if (equipmentData != null)
+		{
+			for (EquipmentItemData itemData : equipmentData.equipmentList)
+			{
+				ItemComposition composition = itemManager.getItemComposition(itemData.itemID);
+
+				BufferedImage itemIcon = itemManager.getImage(itemData.itemID);
+				fightPanel.addEquipmentItem(new EquipmentItemPanel(this, itemIcon, composition.getName(), itemData.slot.name()));
+			}
+		}
+
+		fightPanel.rebuild();
+	}
+
+
+	public void addEquippedWeaponToPanel()
+	{
+		ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+		if (equipment == null) return;
+
+		Item weapon = equipment.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
+		if (weapon == null || weapon.getId() == -1) return;
+
+		int weaponId = weapon.getId();
+		ItemComposition composition = itemManager.getItemComposition(weapon.getId());
+
+
+		var weaponData = combatUtility.getWeaponData();
+
+		BufferedImage weaponIcon = itemManager.getImage(weaponId);
+		fightPanel.addEquipmentItem(new EquipmentItemPanel(this, weaponIcon, composition.getName(), EquipmentInventorySlot.WEAPON.name()));
+
+		if (specEquipmentData == null) {
+			specEquipmentData = new EquipmentData(new ArrayList<>());
+		}
+        List<EquipmentItemData> equipmentItemData = new ArrayList<>(specEquipmentData.equipmentList);
+
+		equipmentItemData.add(new EquipmentItemData(weaponId, EquipmentInventorySlot.WEAPON, weaponData, null));
+
+		/*newlyAddedEquipmentItem = new EquipmentItemData(weaponId, EquipmentInventorySlot.WEAPON);*/
+
+		specEquipmentData = new EquipmentData(equipmentItemData);
+
+		fightPanel.rebuild();
+	}
+
+	public void addEquippedItemsToPanel(EquipmentItemGroup equipmentItemGroup)
+	{
+
+		ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+		if (equipment == null) return;
+
+		List<EquipmentItemData> equipmentList = new ArrayList<>();
+		for (EquipmentInventorySlot slot : EquipmentInventorySlot.values())
+		{
+			Item item = equipment.getItem(slot.getSlotIdx());
+
+            if (item != null)
+			{
+				ItemComposition composition = itemManager.getItemComposition(item.getId());
+				BufferedImage itemIcon = itemManager.getImage(item.getId());
+				if (slot == EquipmentInventorySlot.WEAPON)
+				{
+					var weaponData = combatUtility.getWeaponData();
+					equipmentList.add(new EquipmentItemData(item.getId(), slot, weaponData, null));
+				}
+				else
+				{
+					equipmentList.add(new EquipmentItemData(item.getId(), slot, null, null));
+				}
+				fightPanel.addEquipmentItem(new EquipmentItemPanel(this, itemIcon, composition.getName(), slot.name()));
+            }
+		}
+
+		var equipmentData = new EquipmentData(equipmentList);
+
+		switch (equipmentItemGroup)
+		{
+            case MELEE:
+				setMeleeGear();
+                break;
+            case RANGE:
+				setRangeGear();
+                break;
+            case MAGIC:
+				setMagicGear();
+                break;
+            case SPEC:
+				specEquipmentData = equipmentData;
+                break;
+        }
+
+		fightPanel.rebuild();
+	}
+
+
+	public void clearEquippedItemsPanel()
+	{
+		fightPanel.clearEquippedItems();
+
+		fightPanel.rebuild();
+	}
+
+	public void removeEquippedItem(Component component)
+	{
+		fightPanel.removeEquippedItem(component);
+
+		fightPanel.rebuild();
+	}
+
+	public void equipmentGroupPressed(EquipmentItemGroup equipmentItemGroup)
+	{
+		clientThread.invoke(() ->
+		{
+			setSelectedEquipmentGroup(equipmentItemGroup);
+		});
+	}
+
+	public void addEquippedButtonPressed()
+	{
+		clientThread.invoke(() ->
+		{
+			switch (selectedEquipmentGroup)
+			{
+                case MELEE:
+                case RANGE:
+                case MAGIC:
+					addEquippedItemsToPanel(selectedEquipmentGroup);
+                    break;
+                case SPEC:
+					addEquippedWeaponToPanel();
+                    break;
+            }
+		});
+	}
+
+	public void clearButtonPressed()
+	{
+		clientThread.invoke(() ->
+		{
+			clearEquippedItemsPanel();
+		});
+	}
+
+	public void removeEquippedItemPressed(Component component)
+	{
+		clientThread.invoke(() ->
+		{
+			removeEquippedItem(component);
+		});
+	}
+
+	public void setCombatStyle(CombatStyle combatStyle)
+	{
+		EquipmentData equipmentData = null;
+		switch (combatStyle)
+		{
+			case MAGIC:
+				equipmentData = magicEquipmentData;
+				break;
+			case MELEE:
+				equipmentData = meleeEquipmentData;
+				break;
+			case RANGE:
+				equipmentData = rangeEquipmentData;
+				break;
+		}
+		if (equipmentData == null) return;
+
+		currentModel = modelGetter.createModel(equipmentData);
+		currentEquipmentStats = equipmentData.getEquipmentStats(itemManager);
+		currentWeaponData = equipmentData.getWeapon().weaponData;
+	}
+
 }

@@ -63,6 +63,17 @@ public class EquipmentUtility
         return weapon.getId();
     }
 
+    public static Item getSlot(Client client, EquipmentInventorySlot slot)
+    {
+        ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+        if (equipment == null)
+        {
+            return null;
+        }
+
+        return equipment.getItem(slot.getSlotIdx());
+    }
+
     public static WorldPoint getNearestAdjacentTile(WorldPoint origin, WorldPoint target, int plane)
     {
         var northTile = new WorldPoint(target.getX(), target.getY() + 1, plane);
