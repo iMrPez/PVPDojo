@@ -13,11 +13,9 @@ import javax.swing.*;
 
 import com.pvpdojo.character.*;
 import com.pvpdojo.character.datatypes.*;
-import com.pvpdojo.combat.CombatStyle;
-import com.pvpdojo.combat.CombatUtility;
+import com.pvpdojo.combat.*;
 import com.pvpdojo.combat.equipment.EquipmentStats;
 import com.pvpdojo.combat.equipment.EquipmentUtility;
-import com.pvpdojo.combat.Prayers;
 import com.pvpdojo.combatant.CorePlayer;
 import com.pvpdojo.combatant.Dummy;
 import com.pvpdojo.fightPanel.EquipmentItemPanel;
@@ -95,10 +93,13 @@ public class PVPDojoPlugin extends Plugin
 	public CorePlayer corePlayer;
 
 	@Inject
-	private ItemManager itemManager;
+	public ItemManager itemManager;
 
 	@Inject
 	private HPOrbOverlay hpOrbOverlay;
+
+	@Inject
+	private SpecOrbOverlay specOrbOverlay;
 
 	@Inject
 	public SpecialBarOverlay specialBarOverlay;
@@ -115,7 +116,7 @@ public class PVPDojoPlugin extends Plugin
 	private NavigationButton navButton;
 	private boolean hasDummySpawned = false;
 
-	private FightSetupPanel fightPanel;
+	public FightSetupPanel fightPanel;
 
 	@Override
 	protected void startUp() throws Exception
@@ -130,6 +131,7 @@ public class PVPDojoPlugin extends Plugin
 		overlayManager.add(specialBarOverlay);
 		overlayManager.add(fightOverlay);
 		overlayManager.add(prayerOverlay);
+		overlayManager.add(specOrbOverlay);
 
 		fightPanel = injector.getInstance(FightSetupPanel.class);
 		final BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), "/skull_blue.png");
@@ -178,21 +180,20 @@ public class PVPDojoPlugin extends Plugin
 		overlayManager.remove(specialBarOverlay);
 		overlayManager.remove(fightOverlay);
 		overlayManager.remove(prayerOverlay);
+		overlayManager.remove(specOrbOverlay);
 
 		clientToolbar.removeNavigation(navButton);
 
-		if (dummy != null && dummy.dummyCharacter != null)
-		{
-			dummy.despawnCharacter();
-		}
+		resetPlugin();
 
-		isActive = false;
-		dummy = null;
+		save();
+	}
 
+	public void save()
+	{
 		var saveData = new PVPDojoData(meleeEquipmentData, rangeEquipmentData, magicEquipmentData, specEquipmentData);
 
 		PVPDojoData.saveData(configManager, saveData);
-
 	}
 
 	private boolean isActive = false;
@@ -212,22 +213,6 @@ public class PVPDojoPlugin extends Plugin
 	public EquipmentData magicEquipmentData;
 
 	public EquipmentData specEquipmentData;
-
-	/*public CustomModel magicModel;
-	public CustomModel rangeModel;
-	public CustomModel meleeModel;*/
-
-	/*public EquipmentStats magicGearStats;
-	public EquipmentStats rangeGearStats;
-	public EquipmentStats meleeGearStats;
-
-	public WeaponData magicWeaponData;
-	public WeaponData rangeWeaponData;
-	public WeaponData meleeWeaponData;*/
-
-/*	private boolean isSettingMagicGear = false;
-	private boolean isSettingRangeGear = false;
-	private boolean isSettingMeleeGear = false;*/
 
 	private int ticks = 0;
 
@@ -266,11 +251,17 @@ public class PVPDojoPlugin extends Plugin
 	}
 
 
-
+	boolean hasResetPlugin = false;
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
+		log.info("Game State Changed: " + gameStateChanged.getGameState());
+		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
+		{
+			log.info("Game State is now LOGGED_IN");
+			resetPlugin();
+		}
 
 	}
 
@@ -279,16 +270,6 @@ public class PVPDojoPlugin extends Plugin
 	{
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
-			if (fightStarted)
-			{
-				corePlayer.fightFinished();
-				dummy.fightFinished();
-			}
-
-			if (hasDummySpawned)
-			{
-				despawnDummy();
-			}
 			return;
 		}
 
@@ -337,6 +318,25 @@ public class PVPDojoPlugin extends Plugin
 		}
 
 
+	}
+
+	private void resetPlugin()
+	{
+		if (dummy != null && dummy.dummyCharacter != null)
+		{
+			dummy.despawnCharacter();
+		}
+
+		isActive = false;
+		dummy = null;
+		hasDummySpawned = false;
+		fightStarted = false;
+		fightStarting = false;
+
+		healthOverlay.clearHealth();
+		overheadOverlay.clearOverheads();
+
+		corePlayer.reset();
 	}
 
 
@@ -587,10 +587,20 @@ public class PVPDojoPlugin extends Plugin
 
 		dummy.fightStarted();
 		corePlayer.fightStarted();
+
+		totalDamageOnPlayer = 0;
+		totalDamageOnDummy = 0;
+
+		totalOffPrayerHitsOnPlayer = 0;
+		totalOffPrayerHitsOnDummy = 0;
+
+		totalHitsOnPlayer = 0;
+		totalHitsOnDummy = 0;
 	}
 
 	public void stopFight(boolean win)
 	{
+
 		fightStarted = false;
 		fightStarting = false;
 
@@ -604,23 +614,16 @@ public class PVPDojoPlugin extends Plugin
 		}
 
 
-		dummy.setHealth(config.dummyHitPoints());
-		corePlayer.setHealth(config.playerHitPoints());
+		dummy.setHealth(dummy.getMaxHP());
+		corePlayer.setHealth(corePlayer.getMaxHP());
 
 		dummy.fightFinished();
 		corePlayer.fightFinished();
 		dummy.returnHome();
 
+		hitsplatOverlay.clearHitsplats();
+
 		dummy.setPrayers(new ArrayList<>());
-
-		totalDamageOnPlayer = 0;
-		totalDamageOnDummy = 0;
-
-		totalOffPrayerHitsOnPlayer = 0;
-		totalOffPrayerHitsOnDummy = 0;
-
-		totalHitsOnPlayer = 0;
-		totalHitsOnDummy = 0;
 	}
 
 
@@ -872,6 +875,31 @@ public class PVPDojoPlugin extends Plugin
 			}
 			else
 			{
+
+				/*MenuEntry testMoveEntry = client.getMenu().createMenuEntry(-1)
+						.setOption(ColorUtil.prependColorTag("Test Move", Color.ORANGE))
+						.setTarget(ColorUtil.colorTag(Color.GREEN) + dummy.dummyCharacter.getName())
+						.setType(MenuAction.RUNELITE)
+						.onClick(e -> testMove());
+
+				MenuEntry testMagic = client.getMenu().createMenuEntry(-1)
+						.setOption(ColorUtil.prependColorTag("Test Magic", Color.BLUE))
+						.setTarget(ColorUtil.colorTag(Color.GREEN) + dummy.dummyCharacter.getName())
+						.setType(MenuAction.RUNELITE)
+						.onClick(e -> testMagic());
+
+				MenuEntry testRange = client.getMenu().createMenuEntry(-1)
+						.setOption(ColorUtil.prependColorTag("Test Range", Color.GREEN))
+						.setTarget(ColorUtil.colorTag(Color.GREEN) + dummy.dummyCharacter.getName())
+						.setType(MenuAction.RUNELITE)
+						.onClick(e -> testRange());
+
+				MenuEntry testMelee = client.getMenu().createMenuEntry(-1)
+						.setOption(ColorUtil.prependColorTag("Test Melee", Color.RED))
+						.setTarget(ColorUtil.colorTag(Color.GREEN) + dummy.dummyCharacter.getName())
+						.setType(MenuAction.RUNELITE)
+						.onClick(e -> testMelee());*/
+
 				MenuEntry startFightEntry = client.getMenu().createMenuEntry(-1)
 						.setOption(ColorUtil.prependColorTag("Start Fight", Color.ORANGE))
 						.setTarget(ColorUtil.colorTag(Color.GREEN) + dummy.dummyCharacter.getName())
@@ -889,7 +917,7 @@ public class PVPDojoPlugin extends Plugin
 
 
 
-		if (corePlayer.isInRange())
+		if (corePlayer.isInRange(true))
 		{
 
 			MenuEntry attackEntry = client.getMenu().createMenuEntry(-1)
@@ -913,6 +941,34 @@ public class PVPDojoPlugin extends Plugin
 				.setType(MenuAction.RUNELITE)
 				.onClick(e -> stopFight(false));
 	}
+
+
+	private void testMove()
+	{
+		dummy.moveToPlayer(true);
+	}
+
+	private void testRange()
+	{
+		dummy.setCombatStyle(CombatStyle.RANGE);
+		var attackData = new AttackData(null, dummy.getWeaponData(), false, 1);
+		dummy.tryAttack(attackData);
+	}
+
+	private void testMelee()
+	{
+		dummy.setCombatStyle(CombatStyle.MELEE);
+		var attackData = new AttackData(null, dummy.getWeaponData(), false, 1);
+		dummy.tryAttack(attackData);
+	}
+
+	private void testMagic()
+	{
+		dummy.setCombatStyle(CombatStyle.MAGIC);
+		var attackData = new AttackData(Spell.ICE_BARRAGE, dummy.getWeaponData(), false, 1);
+		dummy.tryAttack(attackData);
+	}
+
 
 	@Provides
 	PVPDojoConfig provideConfig(ConfigManager configManager)
@@ -955,7 +1011,10 @@ public class PVPDojoPlugin extends Plugin
 				ItemComposition composition = itemManager.getItemComposition(itemData.itemID);
 
 				BufferedImage itemIcon = itemManager.getImage(itemData.itemID);
-				fightPanel.addEquipmentItem(new EquipmentItemPanel(this, itemIcon, composition.getName(), itemData.slot.name()));
+				if (itemData.itemID >= 0)
+				{
+					fightPanel.addEquipmentItem(new EquipmentItemPanel(this, itemIcon, composition.getName(), itemData.slot.name()));
+				}
 			}
 		}
 
@@ -985,9 +1044,10 @@ public class PVPDojoPlugin extends Plugin
 		}
         List<EquipmentItemData> equipmentItemData = new ArrayList<>(specEquipmentData.equipmentList);
 
-		equipmentItemData.add(new EquipmentItemData(weaponId, EquipmentInventorySlot.WEAPON, weaponData, null));
+		var stats = modelGetter.getModelStat(BodyPart.WEAPON);
 
-		/*newlyAddedEquipmentItem = new EquipmentItemData(weaponId, EquipmentInventorySlot.WEAPON);*/
+		equipmentItemData.add(new EquipmentItemData(weaponId, EquipmentInventorySlot.WEAPON, weaponData, stats));
+
 
 		specEquipmentData = new EquipmentData(equipmentItemData);
 
@@ -1046,6 +1106,22 @@ public class PVPDojoPlugin extends Plugin
 
 	public void clearEquippedItemsPanel()
 	{
+		switch (selectedEquipmentGroup)
+		{
+            case MELEE:
+				meleeEquipmentData = null;
+                break;
+            case RANGE:
+				rangeEquipmentData = null;
+                break;
+            case MAGIC:
+				magicEquipmentData = null;
+                break;
+            case SPEC:
+				specEquipmentData = null;
+                break;
+        }
+
 		fightPanel.clearEquippedItems();
 
 		fightPanel.rebuild();
@@ -1081,6 +1157,8 @@ public class PVPDojoPlugin extends Plugin
 					addEquippedWeaponToPanel();
                     break;
             }
+
+			save();
 		});
 	}
 
@@ -1100,26 +1178,14 @@ public class PVPDojoPlugin extends Plugin
 		});
 	}
 
-	public void setCombatStyle(CombatStyle combatStyle)
-	{
-		EquipmentData equipmentData = null;
-		switch (combatStyle)
-		{
-			case MAGIC:
-				equipmentData = magicEquipmentData;
-				break;
-			case MELEE:
-				equipmentData = meleeEquipmentData;
-				break;
-			case RANGE:
-				equipmentData = rangeEquipmentData;
-				break;
-		}
-		if (equipmentData == null) return;
 
+
+	public void updateCurrentData(EquipmentData equipmentData)
+	{
 		currentModel = modelGetter.createModel(equipmentData);
 		currentEquipmentStats = equipmentData.getEquipmentStats(itemManager);
 		currentWeaponData = equipmentData.getWeapon().weaponData;
+		//log.info("Current Weapon: " + currentWeaponData.toString());
 	}
 
 }

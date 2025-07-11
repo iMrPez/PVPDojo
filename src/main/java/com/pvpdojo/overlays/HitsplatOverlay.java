@@ -251,4 +251,17 @@ public class HitsplatOverlay extends Overlay
         Point textP = new Point(textPoint.getX() + xBuffer + X_BUFFER, textPoint.getY() + textHeight + yBuffer + Y_BUFFER);
         OverlayUtil.renderTextLocation(graphics, textP, text, Color.WHITE);
     }
+
+    public void clearHitsplats()
+    {
+        for (int i = 0; i < dummyHitsplatFrame.length; i++)
+        {
+            dummyHitsplatFrame[i] = null;
+        }
+
+        for (int i = 0; i < playerHitsplatFrames.length; i++)
+        {
+            playerHitsplatFrames[i] = null;
+        }
+    }
 }

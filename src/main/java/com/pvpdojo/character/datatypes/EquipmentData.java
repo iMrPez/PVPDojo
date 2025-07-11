@@ -118,6 +118,7 @@ public class EquipmentData
 
         for (EquipmentItemData itemData : equipmentList)
         {
+            if (itemData == null) continue;
             var itemStats = itemManager.getItemStats(itemData.itemID);
 
             if (itemStats != null)

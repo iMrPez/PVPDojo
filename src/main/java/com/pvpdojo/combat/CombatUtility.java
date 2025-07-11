@@ -2,6 +2,7 @@ package com.pvpdojo.combat;
 
 import com.pvpdojo.*;
 import com.pvpdojo.character.datatypes.EquipmentData;
+import com.pvpdojo.character.datatypes.EquipmentItemData;
 import com.pvpdojo.character.datatypes.WeaponData;
 import com.pvpdojo.combat.equipment.EquipmentStats;
 import com.pvpdojo.combat.equipment.EquipmentUtility;
@@ -131,14 +132,17 @@ public class CombatUtility
         int weaponType = client.getVarbitValue(Varbits.EQUIPPED_WEAPON_TYPE);
 
         var weaponID = EquipmentUtility.getWeaponID(client);
+        var itemStats = itemManager.getItemStats(weaponID);
+
+
 
         if (weaponType == 0) // Unarmed
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Punch", false);
-                case 1: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Kick", false);
-                case 3: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Punch", false, itemStats);
+                case 1: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Kick", false, itemStats);
+                case 3: return new WeaponData(weaponID,0, "Unarmed", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false, itemStats);
             }
         }
 
@@ -146,10 +150,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false);
-                case 1: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Hack", false);
-                case 2: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Smash", false);
-                case 3: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false, itemStats);
+                case 1: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Hack", false, itemStats);
+                case 2: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Smash", false, itemStats);
+                case 3: return new WeaponData(weaponID,1, "Axe", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false, itemStats);
             }
         }
 
@@ -157,9 +161,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Pound", false);
-                case 1: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pummel", false);
-                case 3: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Pound", false, itemStats);
+                case 1: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pummel", false, itemStats);
+                case 3: return new WeaponData(weaponID,2, "Blunt", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false, itemStats);
             }
         }
 
@@ -168,9 +172,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false);
-                case 1: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true);
-                case 3: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false);
+                case 0: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false, itemStats);
+                case 1: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true, itemStats);
+                case 3: return new WeaponData(weaponID,3, "Bow", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false, itemStats);
             }
         }
 
@@ -178,9 +182,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false);
-                case 1: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true);
-                case 3: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false);
+                case 0: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false, itemStats);
+                case 1: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true, itemStats);
+                case 3: return new WeaponData(weaponID,5, "Crossbow", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false, itemStats);
             }
         }
 
@@ -188,10 +192,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false);
-                case 1: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Slash", false);
-                case 2: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 2, "Lunge", false);
-                case 3: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false, itemStats);
+                case 1: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Slash", false, itemStats);
+                case 2: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 2, "Lunge", false, itemStats);
+                case 3: return new WeaponData(weaponID,9, "Slash Sword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false, itemStats);
             }
         }
 
@@ -199,10 +203,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 0, "Lunge", false);
-                case 1: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.SLASH, 1, "Swipe", false);
-                case 2: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.CRUSH, 2, "Pound", false);
-                case 3: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 0, "Lunge", false, itemStats);
+                case 1: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.SLASH, 1, "Swipe", false, itemStats);
+                case 2: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.CRUSH, 2, "Pound", false, itemStats);
+                case 3: return new WeaponData(weaponID,15, "Spear", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false, itemStats);
             }
         }
 
@@ -210,10 +214,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Pound", false);
-                case 1: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pummel", false);
-                case 2: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 2, "Pummel", false);
-                case 3: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Pound", false, itemStats);
+                case 1: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pummel", false, itemStats);
+                case 2: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.STAB, 2, "Pummel", false, itemStats);
+                case 3: return new WeaponData(weaponID,16, "Spiked", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Block", false, itemStats);
             }
         }
 
@@ -222,10 +226,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.STAB, 0, "Stab", false);
-                case 1: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.STAB, 1, "Lunge", false);
-                case 2: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 2, "Slash", false);
-                case 3: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.STAB, 0, "Stab", false, itemStats);
+                case 1: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.STAB, 1, "Lunge", false, itemStats);
+                case 2: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 2, "Slash", false, itemStats);
+                case 3: return new WeaponData(weaponID,17, "Stab Sword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false, itemStats);
             }
         }
 
@@ -233,10 +237,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Bash", false);
-                case 1: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pound", false);
-                case 3: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Focus", false);
-                case 4: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MAGIC_AUTOCAST, WeaponStyleType.SLASH, 4, "Autocast", false);
+                case 0: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.CRUSH, 0, "Bash", false, itemStats);
+                case 1: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 1, "Pound", false, itemStats);
+                case 3: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.CRUSH, 3, "Focus", false, itemStats);
+                case 4: return new WeaponData(weaponID,18, "Staff", WeaponStyleControl.MAGIC_AUTOCAST, WeaponStyleType.SLASH, 4, "Autocast", false, itemStats);
             }
         }
 
@@ -244,9 +248,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false);
-                case 1: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true);
-                case 3: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false);
+                case 0: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_ACCURATE, WeaponStyleType.RANGE, 0, "Accurate", false, itemStats);
+                case 1: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_RAPID, WeaponStyleType.RANGE, 1, "Rapid", true, itemStats);
+                case 3: return new WeaponData(weaponID,19, "Thrown", WeaponStyleControl.RANGE_LONGRANGE, WeaponStyleType.RANGE, 3, "Longrange", false, itemStats);
             }
         }
 
@@ -254,9 +258,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Flick", false);
-                case 1: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.SLASH, 1, "Lash", false);
-                case 3: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Deflect", false);
+                case 0: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Flick", false, itemStats);
+                case 1: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_CONTROLLED, WeaponStyleType.SLASH, 1, "Lash", false, itemStats);
+                case 3: return new WeaponData(weaponID,20, "Whip", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Deflect", false, itemStats);
             }
         }
 
@@ -264,10 +268,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false);
-                case 1: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Slash", false);
-                case 2: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Smash", false);
-                case 3: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.SLASH, 0, "Chop", false, itemStats);
+                case 1: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.SLASH, 1, "Slash", false, itemStats);
+                case 2: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Smash", false, itemStats);
+                case 3: return new WeaponData(weaponID,23, "Godsword", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.SLASH, 3, "Block", false, itemStats);
             }
         }
 
@@ -275,9 +279,9 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_ACCURATE, WeaponStyleType.MAGIC, 0, "Accurate", false);
-                case 1: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_ACCURATE, WeaponStyleType.MAGIC, 1, "Accurate", false);
-                case 3: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_LONGRANGE, WeaponStyleType.MAGIC, 3, "Longrange", false);
+                case 0: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_ACCURATE, WeaponStyleType.MAGIC, 0, "Accurate", false, itemStats);
+                case 1: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_ACCURATE, WeaponStyleType.MAGIC, 1, "Accurate", false, itemStats);
+                case 3: return new WeaponData(weaponID,24, "Powered Staff", WeaponStyleControl.MAGIC_LONGRANGE, WeaponStyleType.MAGIC, 3, "Longrange", false, itemStats);
             }
         }
 
@@ -285,10 +289,10 @@ public class CombatUtility
         {
             switch (style)
             {
-                case 0: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.STAB, 0, "Stab", false);
-                case 1: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.STAB, 1, "Lunge", false);
-                case 2: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Pound", false);
-                case 3: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false);
+                case 0: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_ACCURATE, WeaponStyleType.STAB, 0, "Stab", false, itemStats);
+                case 1: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.STAB, 1, "Lunge", false, itemStats);
+                case 2: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_AGGRESSIVE, WeaponStyleType.CRUSH, 2, "Pound", false, itemStats);
+                case 3: return new WeaponData(weaponID,30, "Partisan", WeaponStyleControl.MELEE_DEFENSIVE, WeaponStyleType.STAB, 3, "Block", false, itemStats);
             }
         }
 
@@ -373,16 +377,32 @@ public class CombatUtility
             var hitAmount = Math.max(random.nextInt(maxHit), 1);
 
 
-            var damageAfterPrayer = getDamageAfterPrayer(hitAmount, attackData.spell != null ? CombatStyle.MAGIC : attackerWeaponData.getWeaponCombatStyle(), targetPrayers);
+            var damageAfterPrayer = getDamageAfterPrayer(hitAmount, attackData.spell != null ? CombatStyle.MAGIC : attackerWeaponData.getWeaponCombatStyle(false), targetPrayers);
             var damageInfo = new DamageInfo(damageAfterPrayer, damageAfterPrayer != hitAmount);
             return damageInfo;
         }
         else
         {
             var hitAmount = 100;
-            var damageAfterPrayer = getDamageAfterPrayer(hitAmount, attackData.spell != null ? CombatStyle.MAGIC : attackerWeaponData.getWeaponCombatStyle(), targetPrayers);
+            var damageAfterPrayer = getDamageAfterPrayer(hitAmount, attackData.spell != null ? CombatStyle.MAGIC : attackerWeaponData.getWeaponCombatStyle(false), targetPrayers);
             return new DamageInfo(0, damageAfterPrayer != hitAmount);
         }
+    }
+
+    public float specMaxHit(WeaponData weaponData, EquipmentStats stats, CombatantSkills skills, List<Prayer> attackerPrayers, List<Prayer> targetPrayers)
+    {
+        var effectiveAttackerSkills = plugin.combatUtility.getEffectiveSkills(skills, weaponData, attackerPrayers);
+        var maxHit = getMaxHit(null, effectiveAttackerSkills, weaponData, stats);
+
+        var damageAfterPrayer = getDamageAfterPrayer(maxHit, weaponData.getWeaponCombatStyle(false), targetPrayers);
+
+        if (weaponData.getCanSpec())
+        {
+            var specData = weaponData.getSpecData();
+            return damageAfterPrayer * specData.damageMultiplier;
+        }
+
+        return 0;
     }
 
     public int getDamageAfterPrayer(int damageAmount, CombatStyle attackStyle, List<Prayer> targetPrayers)
@@ -479,13 +499,10 @@ public class CombatUtility
         }
 
         var spellWidget = client.getSelectedWidget().getName();
-        log.info("Selected Spell: " + spellWidget);
         for (var spell : Spell.values())
         {
-            log.info("Checking: (" + spell.SpellName + " | " + spellWidget + ")");
             if (spellWidget.contains(spell.SpellName))
             {
-                log.info("Found Spell: " + spell.SpellName);
                 return spell;
             }
         }

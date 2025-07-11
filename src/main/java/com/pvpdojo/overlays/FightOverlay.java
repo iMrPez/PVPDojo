@@ -62,6 +62,27 @@ public class FightOverlay extends Overlay
                 .rightColor(plugin.totalDamageOnPlayer > plugin.totalDamageOnDummy ? Color.green : Color.white)
                 .build());
 
+
+/*        if (plugin.dummy != null && plugin.dummy.dummyCharacter != null && plugin.dummy.dummyCharacter.getCharacterObject() != null)
+        {
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Prayer: ")
+                    .right("" + plugin.dummy.combatAI.prayerSwapTimer)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Gear: ")
+                    .right("" + plugin.dummy.combatAI.equipmentSwapTimer)
+                    .build());
+
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Dist: ")
+                    .right("" + plugin.dummy.getDistanceToPlayer())
+                    .build());
+
+        }*/
+
+
         /*panelComponent.getChildren().add(LineComponent.builder()
                 .left("Combat Ticks: ")
                 .right("" + plugin.corePlayer.combatActionTicks)

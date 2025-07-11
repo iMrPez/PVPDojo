@@ -124,33 +124,6 @@ public class Character
     }
 
 
-    public void setOrientation(int orientation)
-    {
-        if (characterObject != null)
-        {
-            characterObject.setOrientation(orientation);
-        }
-    }
-
-    public void setLocation(LocalPoint lp, int plane)
-    {
-        if (characterObject != null)
-        {
-            characterObject.setLocation(lp, plane);
-        }
-    }
-
-
-    public void toggleActive(ClientThread clientThread)
-    {
-        setActive(!active, true, clientThread);
-    }
-
-    public void setVisible(boolean visible, ClientThread clientThread)
-    {
-        clientThread.invokeLater(() -> characterObject.setActive(visible));
-    }
-
     public void setActive(boolean setActive, boolean reset, ClientThread clientThread)
     {
         clientThread.invokeLater(() ->

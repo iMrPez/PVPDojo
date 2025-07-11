@@ -2,6 +2,7 @@ package com.pvpdojo.combatant;
 
 import com.pvpdojo.*;
 import com.pvpdojo.character.CharacterObject;
+import com.pvpdojo.character.datatypes.AnimationType;
 import com.pvpdojo.character.datatypes.DamageData;
 import com.pvpdojo.character.datatypes.WeaponData;
 import com.pvpdojo.combat.*;
@@ -51,7 +52,6 @@ public class CorePlayer extends Combatant
         this.plugin = plugin;
         this.config = config;
 
-        initialize(config.playerHitPoints());
     }
 
 
@@ -110,7 +110,7 @@ public class CorePlayer extends Combatant
 
     public void checkForAttack()
     {
-        if (!isInRange()) return;
+        if (!isInRange(false)) return;
 
         if (hasRequestedSpecialBar && (shouldAutoAttack || instantHitWeaponCountDown > 0))
         {
@@ -128,6 +128,8 @@ public class CorePlayer extends Combatant
     @Override
     public void fightStarted()
     {
+        setHealth(getMaxHP());
+
         resetConsumables();
     }
 
@@ -138,7 +140,7 @@ public class CorePlayer extends Combatant
         reset();
         prayers.clear();
         updateOverheadPrayers();
-        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, config.playerHitPoints(), config.playerHitPoints()));
+        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, getMaxHP(), getMaxHP()));
 
     }
 
@@ -149,7 +151,7 @@ public class CorePlayer extends Combatant
     }
 
     @Override
-    public void setAnimation(int animationId)
+    public void setAnimation(int animationId, AnimationType type, boolean force)
     {
         client.getLocalPlayer().setAnimation(animationId);
         client.getLocalPlayer().setAnimationFrame(0);
@@ -214,7 +216,6 @@ public class CorePlayer extends Combatant
     public void requestedSpecialBar()
     {
         requestSpecCount++;
-        log.info("Spec Requested: " + requestSpecCount);
         hasRequestedSpecialBar = true;
     }
 
@@ -239,54 +240,11 @@ public class CorePlayer extends Combatant
     }
 
 
-    private void updateActivePrayers()
-    {
-        prayers.clear();
-
-        List<Prayer> knownPrayers = new ArrayList<>() {};
-        knownPrayers.add(Prayer.THICK_SKIN);
-        knownPrayers.add(Prayer.BURST_OF_STRENGTH);
-        knownPrayers.add(Prayer.CLARITY_OF_THOUGHT);
-        knownPrayers.add(Prayer.SHARP_EYE);
-        knownPrayers.add(Prayer.MYSTIC_WILL);
-        knownPrayers.add(Prayer.ROCK_SKIN);
-        knownPrayers.add(Prayer.SUPERHUMAN_STRENGTH);
-        knownPrayers.add(Prayer.IMPROVED_REFLEXES);
-        knownPrayers.add(Prayer.HAWK_EYE);
-        knownPrayers.add(Prayer.MYSTIC_LORE);
-        knownPrayers.add(Prayer.STEEL_SKIN);
-        knownPrayers.add(Prayer.ULTIMATE_STRENGTH);
-        knownPrayers.add(Prayer.INCREDIBLE_REFLEXES);
-        knownPrayers.add(Prayer.PROTECT_FROM_MELEE);
-        knownPrayers.add(Prayer.PROTECT_FROM_MISSILES);
-        knownPrayers.add(Prayer.PROTECT_FROM_MAGIC);
-        knownPrayers.add(Prayer.EAGLE_EYE);
-        knownPrayers.add(Prayer.MYSTIC_MIGHT);
-        knownPrayers.add(Prayer.CHIVALRY);
-        knownPrayers.add(Prayer.PIETY);
-        knownPrayers.add(Prayer.DEADEYE);
-        knownPrayers.add(Prayer.RIGOUR);
-        knownPrayers.add(Prayer.MYSTIC_VIGOUR);
-        knownPrayers.add(Prayer.AUGURY);
-
-
-
-        for (Prayer prayer : knownPrayers)
-        {
-            if (client.getVarbitValue(prayer.getVarbit()) == 1)
-            {
-                prayers.add(prayer);
-                log.info(prayer.name());
-            }
-        }
-    }
-
-
     @Override
     public void displayDamage(DamageData data)
     {
 
-        log.info("Displaying Player Damage!");
+        //log.info("Displaying Player Damage!");
         if (data.isSpec)
         {
             for (int i = 0; i < data.getSpecHitCount(); i++)
@@ -305,7 +263,7 @@ public class CorePlayer extends Combatant
         }
 
         EquipmentUtility.playCombatStyleHitSound(client, data.combatStyle);
-        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 10, HealthbarSprite.DEFAULT, config.playerHitPoints(), getHealth()));
+        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 10, HealthbarSprite.DEFAULT, getMaxHP(), getHealth()));
 
         if (getHealth() <= 0)
         {
@@ -344,15 +302,15 @@ public class CorePlayer extends Combatant
         attackInterrupted();
     }
 
-    public boolean isInRange()
+    public boolean isInRange(boolean includeSpell)
     {
         CharacterObject dummyObject = plugin.dummy.dummyCharacter.getCharacterObject();
         LocalPoint localPoint = dummyObject.getLocation();
         var dummyWP = WorldPoint.fromLocal(client, localPoint);
 
         var spell = plugin.combatUtility.getSpell();
-        var isMelee = getWeaponData().getWeaponCombatStyle() == CombatStyle.MELEE;
-        return EquipmentUtility.isInRange(dummyWP, client.getLocalPlayer().getWorldLocation(), spell == null && isMelee ? 1 : 10);
+        var isMelee = getWeaponData().getWeaponCombatStyle(false) == CombatStyle.MELEE;
+        return EquipmentUtility.isInRange(dummyWP, client.getLocalPlayer().getWorldLocation(), (!includeSpell || spell == null) && isMelee ? 1 : 10);
     }
 
     private void attackInterrupted()
@@ -399,7 +357,7 @@ public class CorePlayer extends Combatant
     @Override
     public CombatantSkills getSkills()
     {
-        return new CombatantSkills(99, 99, 99, 99, 99);
+        return plugin.fightPanel.getPlayerSkills();
     }
 
     @Override
@@ -422,6 +380,12 @@ public class CorePlayer extends Combatant
             }
         }
         return null;
+    }
+
+    @Override
+    public int getMaxHP()
+    {
+        return plugin.fightPanel.getPlayerHP();
     }
 
     @Override

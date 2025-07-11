@@ -1,6 +1,7 @@
 package com.pvpdojo.combatant;
 
 import com.pvpdojo.*;
+import com.pvpdojo.character.datatypes.AnimationType;
 import com.pvpdojo.character.datatypes.DamageData;
 import com.pvpdojo.character.datatypes.DamageDisplayData;
 import com.pvpdojo.character.datatypes.WeaponData;
@@ -44,7 +45,7 @@ public abstract class Combatant
     public int frozenTicks = 0;
     private int frozenCooldownTicks = 0;
 
-    private int maxHealth = 99;
+    public int actionAnimationTimer = 0;
     private int health = 99;
 
     private List<DamageDisplayData> hitDisplays = new ArrayList<>();
@@ -59,18 +60,17 @@ public abstract class Combatant
 
     public int specialAttackEnergy = 100;
 
-    protected void initialize(int maxHealth)
-    {
-        this.health = maxHealth;
-        this.maxHealth = maxHealth;
-    }
-
     protected void triggerGameTick()
     {
         handleAttack();
         handleHitDisplay();
         handleFreeze();
         handleInventory();
+
+        if (actionAnimationTimer > 0)
+        {
+            actionAnimationTimer--;
+        }
     }
 
     private void handleInventory()
@@ -286,7 +286,7 @@ public abstract class Combatant
                 break;
             case HARD_FOOD:
                 client.playSoundEffect(2393);
-                setAnimation(829);
+                setAnimation(829, AnimationType.ACTIVE, false);
                 if (combatActionTicks > 0 && combatActionTicks < 4)
                 {
                     combatActionTicks = 4;
@@ -297,7 +297,7 @@ public abstract class Combatant
                 break;
             case COMBO_FOOD:
                 client.playSoundEffect(2393);
-                setAnimation(829);
+                setAnimation(829, AnimationType.ACTIVE, false);
                 if (combatActionTicks > 0)
                 {
                     combatActionTicks += 2;
@@ -310,7 +310,7 @@ public abstract class Combatant
                 break;
             case SARA_BREW:
                 client.playSoundEffect(2401);
-                setAnimation(829);
+                setAnimation(829, AnimationType.ACTIVE, false);
                 potionActionTicks = 3;
                 foodActionTicks = 3;
                 saraBrewUses--;
@@ -318,7 +318,7 @@ public abstract class Combatant
                 break;
             case SUPER_RESTORE:
                 client.playSoundEffect(2401);
-                setAnimation(829);
+                setAnimation(829, AnimationType.ACTIVE, false);
                 potionActionTicks = 3;
                 foodActionTicks = 3;
                 superRestoreUses--;
@@ -331,9 +331,9 @@ public abstract class Combatant
     {
         if (properties.overheal)
         {
-            if (health >= maxHealth)
+            if (health >= getMaxHP())
             {
-                setHealth(Math.max(maxHealth + properties.health, health));
+                setHealth(Math.max(getMaxHP() + properties.health, health));
             }
             else
             {
@@ -342,9 +342,9 @@ public abstract class Combatant
         }
         else
         {
-            if (health <= maxHealth)
+            if (health <= getMaxHP())
             {
-                health = Math.min(Math.max(health + properties.health, 0), maxHealth);
+                health = Math.min(Math.max(health + properties.health, 0), getMaxHP());
             }
         }
 
@@ -353,9 +353,14 @@ public abstract class Combatant
     private void doAttack(AttackData attackData, EquipmentStats equipmentStats)
     {
         var weaponData = attackData.weaponData;
-        var combatStyle = weaponData.getWeaponCombatStyle();
+        if (weaponData == null) return;
+        var combatStyle = weaponData.getWeaponCombatStyle(false);
 
-        updateCombatActionTicks(attackData.spell != null ? 5 : (int) equipmentStats.WEAPON_SPEED);
+        if (!attackData.isSpec || (weaponData.getSpecData() != null && !attackData.weaponData.getIsInstantHit()))
+        {
+            updateCombatActionTicks(attackData.spell != null ? 5 : (int) equipmentStats.WEAPON_SPEED);
+
+        }
 
 
         var target = getTarget();
@@ -387,7 +392,7 @@ public abstract class Combatant
         var weapon = getWeaponAnimationData();
         if (attackData.spell != null)
         {
-            setAnimation(attackData.spell.SpellAnim);
+            setAnimation(attackData.spell.SpellAnim, AnimationType.ACTIVE, false);
             EquipmentUtility.playSound(client, attackData.spell.SpellSoundID);
         }
         else
@@ -397,7 +402,7 @@ public abstract class Combatant
                 EquipmentUtility.playSound(client, weaponData.getWeaponAttackSound());
                 if (weapon != null)
                 {
-                    setAnimation(weapon.specID);
+                    setAnimation(weapon.specID, AnimationType.ACTIVE, false);
                 }
                 specialAttackEnergy -= attackData.weaponData.getSpecData().energy;
             }
@@ -406,7 +411,7 @@ public abstract class Combatant
                 EquipmentUtility.playSound(client, weaponData.getWeaponAttackSound());
                 if (weapon != null)
                 {
-                    setAnimation(weapon.getStyleID(weaponData.getStyleIndex()));
+                    setAnimation(weapon.getStyleID(weaponData.getStyleIndex()), AnimationType.ACTIVE, false);
                 }
             }
         }
@@ -419,13 +424,9 @@ public abstract class Combatant
 
     protected void requestAttack(AttackData data)
     {
-        /*if (combatActionTicks <= 1 || (data.isSpec && data.weaponData.getCanSpec() && data.weaponData.getSpecData().instantHit))
-        {*/
-            //log.info("Weapon: " + data.weaponData.getWeaponTypeName() + " | Is Spec: " + data.isSpec + " | Spec Count: " + data.specCount);
-            hasRequestedAttack = true;
-            requestedAttackData = data;
-            requestedEquipmentStats = getEquipmentStats();
-        /*}*/
+        hasRequestedAttack = true;
+        requestedAttackData = data;
+        requestedEquipmentStats = getEquipmentStats();
     }
 
     public void cancelAttack()
@@ -456,7 +457,7 @@ public abstract class Combatant
 
     public abstract void fightFinished();
 
-    public abstract void setAnimation(int animationId);
+    public abstract void setAnimation(int animationId, AnimationType type, boolean force);
 
     public abstract void attackedTarget(Combatant combatant, DamageData data, DamageInfo damageInfo);
 
@@ -474,6 +475,7 @@ public abstract class Combatant
 
     public abstract WeaponAnimationData getWeaponAnimationData();
 
+    public abstract int getMaxHP();
 
     protected abstract void displayCombatTicks(int newActionTicks);
 
@@ -513,9 +515,6 @@ public abstract class Combatant
         return health;
     }
 
-    public int getMaxHealth() {
-        return maxHealth;
-    }
 
     public void setHealth(int value)
     {

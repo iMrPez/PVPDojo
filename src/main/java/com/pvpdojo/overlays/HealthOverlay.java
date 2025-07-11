@@ -225,4 +225,10 @@ public class HealthOverlay extends Overlay {
             OverlayUtil.renderImageLocation(graphics, p, subImage);
         }
     }
+
+    public void clearHealth()
+    {
+        this.healthKeyFrame = null;
+        this.playerHealthKeyFrame = null;
+    }
 }

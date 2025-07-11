@@ -1,8 +1,8 @@
 package com.pvpdojo;
 
 import com.pvpdojo.character.datatypes.EquipmentItemGroup;
+import com.pvpdojo.combatant.CombatantSkills;
 import com.pvpdojo.fightPanel.EquipmentItemPanel;
-import net.runelite.api.*;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
 
 public class FightSetupPanel extends PluginPanel
 {
@@ -63,7 +62,40 @@ public class FightSetupPanel extends PluginPanel
         repaint();
         revalidate();
     }
-    
+
+
+
+    public CombatantSkills getDummySkills()
+    {
+        return new CombatantSkills(
+                (int)dummyAttackSpinner.getValue(),
+                (int)dummyStrengthSpinner.getValue(),
+                (int)dummyDefenceSpinner.getValue(),
+                (int)dummyRangeSpinner.getValue(),
+                (int)dummyMagicSpinner.getValue()
+        );
+    }
+
+    public CombatantSkills getPlayerSkills()
+    {
+        return new CombatantSkills(
+                (int)playerAttackSpinner.getValue(),
+                (int)playerStrengthSpinner.getValue(),
+                (int)playerDefenceSpinner.getValue(),
+                (int)playerRangeSpinner.getValue(),
+                (int)playerMagicSpinner.getValue()
+        );
+    }
+
+    public int getDummyHP()
+    {
+        return (int)dummyHitpointsSpinner.getValue();
+    }
+
+    public int getPlayerHP()
+    {
+        return (int)playerHitpointsSpinner.getValue();
+    }
     
     public void addEquipmentItem(EquipmentItemPanel equipmentItem)
     {
@@ -89,15 +121,19 @@ public class FightSetupPanel extends PluginPanel
         {
             case MELEE:
                 selectedEquipment.setText("MELEE");
+                selectedEquipment.setForeground(Color.red);
                 break;
             case RANGE:
                 selectedEquipment.setText("RANGE");
+                selectedEquipment.setForeground(Color.green);
                 break;
             case MAGIC:
                 selectedEquipment.setText("MAGIC");
+                selectedEquipment.setForeground(Color.blue);
                 break;
             case SPEC:
                 selectedEquipment.setText("SPEC");
+                selectedEquipment.setForeground(Color.yellow);
                 break;
         }
     }
@@ -982,6 +1018,7 @@ public class FightSetupPanel extends PluginPanel
                         //---- selectedEquipment ----
                         selectedEquipment.setHorizontalAlignment(SwingConstants.CENTER);
                         selectedEquipment.setText("MELEE");
+                        selectedEquipment.setForeground(Color.red);
                         selectedEquipment.setPreferredSize(new Dimension(66, 15));
                         equipmentListPanel.add(selectedEquipment);
 

@@ -1,5 +1,7 @@
 package com.pvpdojo.character;
 
+import com.pvpdojo.character.datatypes.AnimationType;
+import com.pvpdojo.character.datatypes.CharacterState;
 import com.pvpdojo.combat.weapon.WeaponAnimationData;
 import net.runelite.api.*;
 import net.runelite.api.Point;
@@ -19,28 +21,25 @@ public class CharacterObject extends RuneLiteObjectController
     private static final Logger log = LoggerFactory.getLogger(CharacterObject.class);
     private final Client client;
     private Model baseModel;
-    private boolean freeze;
+    private CharacterAnimationController animationController;
+
     public boolean isMoving = false;
     public boolean isRunning = false;
-
-    private CharacterAnimationController animationController;
     private WeaponAnimationData weaponAnimationData;
+    private boolean freeze;
+
+    private AnimationType currentAnimationType = AnimationType.STANDARD;
 
     public CharacterObject(Client client)
     {
         this.client = client;
     }
 
-    private int startCycle;
-
     public void setModel(Model baseModel)
     {
         this.baseModel = baseModel;
     }
 
-    public void setFreeze(boolean freeze) {
-        this.freeze = freeze;
-    }
 
     public Shape getConvexHull(Client client)
     {
@@ -219,16 +218,23 @@ public class CharacterObject extends RuneLiteObjectController
             else
             {
                 ac.setFinished(true);
-                setAnimation(getBaseAnimation());
+                setAnimation(getBaseAnimation(), AnimationType.STANDARD, true);
                 setLoop(true);
             }
-
-            /*if (ac.isFinished() && despawnOnFinish)
-            {
-                setActive(false);
-            }*/
         });
     }
+
+
+    public boolean isLooping()
+    {
+        if (animationController != null)
+        {
+            return animationController.isLoop();
+        }
+
+        return false;
+    }
+
 
     public int getBaseAnimation()
     {
@@ -236,7 +242,6 @@ public class CharacterObject extends RuneLiteObjectController
         {
             if (isMoving)
             {
-                //log.info("Returning: " + (isRunning ? weaponAnimationData.runID : weaponAnimationData.walkID));
                 return isRunning ? weaponAnimationData.runID : weaponAnimationData.walkID;
             }
             else
@@ -286,11 +291,8 @@ public class CharacterObject extends RuneLiteObjectController
             setupAnimController(getBaseAnimation());
         }
 
+        animationController.tick(ticksSinceLastFrame);
 
-        if (!freeze)
-        {
-            animationController.tick(ticksSinceLastFrame);
-        }
     }
 
     @Override
@@ -338,12 +340,14 @@ public class CharacterObject extends RuneLiteObjectController
         ac.setAnimation(animation);
     }
 
-    public void setAnimation(int animId)
+    public void setAnimation(int animId, AnimationType type, boolean loop)
     {
-        //log.info("ID: " + animId);
         CharacterAnimationController ac = getController();
         if (ac == null)
         {
+            //log.info("Setting Animation to " + animId + " with type " + type + " | LOOP: " + loop);
+            currentAnimationType = type;
+            setLoop(loop);
             setupAnimController( animId);
             return;
         }
@@ -353,11 +357,14 @@ public class CharacterObject extends RuneLiteObjectController
             return;
         }
 
+        //log.info("Setting Animation to " + animId + " with type " + type + " | LOOP: " + loop);
+        currentAnimationType = type;
+        setLoop(loop);
         ac.setAnimation(client.loadAnimation(animId));
     }
 
 
-    public void setAnimationFrame(int animFrame, boolean allowFreeze)
+    public void setAnimationFrame(int animFrame)
     {
         //log.info("Anim Frame: " + animFrame);
         CharacterAnimationController ac = getController();
@@ -377,7 +384,7 @@ public class CharacterObject extends RuneLiteObjectController
             animFrame = animation.getDuration() - 1;
         }
 
-        if (allowFreeze)
+        if (true)
         {
             if (animFrame == -1)
             {
@@ -392,6 +399,7 @@ public class CharacterObject extends RuneLiteObjectController
         }
 
         freeze = false;
+
         ac.setFrame(animFrame);
     }
 

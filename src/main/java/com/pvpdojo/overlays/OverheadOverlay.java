@@ -155,6 +155,14 @@ public class OverheadOverlay extends Overlay
         }
     }
 
+    public void clearOverheads()
+    {
+        this.dummyPrayerSprite = OverheadSprite.NONE;
+        this.dummySkullSprite = OverheadSprite.NONE;
+        this.playerPrayerSprite = OverheadSprite.NONE;
+        this.playerSkullSprite = OverheadSprite.NONE;
+    }
+
     public void setDummyPrayerSprite(OverheadSprite prayerSprite)
     {
         this.dummyPrayerSprite = prayerSprite;

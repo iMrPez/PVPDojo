@@ -16,4 +16,14 @@ public class AttackData
         this.isSpec = isSpec;
         this.specCount = specCount;
     }
+
+    @Override
+    public String toString() {
+        return "AttackData{" +
+                "spell=" + spell +
+                ", weaponData=" + weaponData +
+                ", isSpec=" + isSpec +
+                ", specCount=" + specCount +
+                '}';
+    }
 }

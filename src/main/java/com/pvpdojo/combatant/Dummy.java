@@ -3,8 +3,7 @@ package com.pvpdojo.combatant;
 import com.pvpdojo.*;
 import com.pvpdojo.character.*;
 import com.pvpdojo.character.Character;
-import com.pvpdojo.character.datatypes.DamageData;
-import com.pvpdojo.character.datatypes.WeaponData;
+import com.pvpdojo.character.datatypes.*;
 import com.pvpdojo.combat.*;
 import com.pvpdojo.combat.equipment.EquipmentStats;
 import com.pvpdojo.combat.equipment.EquipmentUtility;
@@ -46,14 +45,17 @@ public class Dummy extends Combatant
 
     private WorldPoint startLocation;
 
-    private boolean isTryingToSpec = false;
+    public boolean isTryingToSpec = false;
 
     private boolean isTryingToRun = true;
 
-    public WorldPoint[] pathWP = new WorldPoint[0];
+    private WorldPoint[] pathWP = new WorldPoint[0];
 
     private long lastClientTickTime = -1;
     private long clientTickDelta = -1;
+
+
+    public CharacterState state = CharacterState.IDLE;
 
     public final CombatAI combatAI;
 
@@ -70,7 +72,6 @@ public class Dummy extends Combatant
         dummyCharacter = initializeCharacter(client.getLocalPlayer());
         spawn();
 
-        initialize(config.dummyHitPoints());
         combatAI = new CombatAI(client, plugin, config, this);
     }
 
@@ -79,8 +80,7 @@ public class Dummy extends Combatant
         lastTickTime = System.currentTimeMillis();
         triggerGameTick();
 
-
-        if (plugin.hasFightStarted())
+        if (plugin.hasFightStarted() && config.useDummyAI())
         {
             combatAI.OnGameTick();
         }
@@ -93,6 +93,8 @@ public class Dummy extends Combatant
         {
             lookingAtTarget = false;
         }
+
+
 
     }
 
@@ -112,62 +114,140 @@ public class Dummy extends Combatant
             lookAtUpdate();
         }
 
+        switch (state)
+        {
+            case IDLE:
+                break;
+            case MOVING:
+                break;
+            case DOING_ACTION:
+                if (actionAnimationTimer <= 0)
+                {
+                    setState(CharacterState.IDLE);
+                }
+                break;
+        }
+
         updatePathing();
 
         setModel(dummyCharacter, getModel());
 
+        if (state != CharacterState.DOING_ACTION && actionAnimationTimer <= 0)
+        {
+            setAnimation(dummyCharacter.getCharacterObject().getBaseAnimation(), AnimationType.STANDARD, true);
+        }
+
     }
 
 
-    public void tryAttack(Spell spell)
+    private void equipCombatStyle(CombatStyle combatStyle)
     {
-        var weaponData = getWeaponData();
-        var attackData = new AttackData(spell, weaponData, isTryingToSpec, getSpecCount());
+        switch (combatStyle)
+        {
+            case MAGIC:
+                equipment.equipData(plugin.magicEquipmentData);
+                break;
+            case MELEE:
+                equipment.equipData(plugin.meleeEquipmentData);
+                break;
+            case RANGE:
+                equipment.equipData(plugin.rangeEquipmentData);
+                break;
+        }
+    }
+
+    public void tryAttack(AttackData attackData)
+    {
+        if (state != CharacterState.IDLE) return;
+
+        setState(CharacterState.DOING_ACTION);
+
+        /*var weaponData = getWeaponData();
+        var attackData = new AttackData(spell, weaponData, isTryingToSpec, );*/
         requestAttack(attackData);
     }
 
-    public void setPathWP(WorldPoint[] path)
+    private void setState(CharacterState characterState)
+    {
+        if (characterState == CharacterState.DOING_ACTION)
+        {
+            actionAnimationTimer = 3;
+            state = characterState;
+        }
+
+        if (actionAnimationTimer > 0) return;
+
+        state = characterState;
+    }
+
+    private void setPathWP(WorldPoint[] path)
     {
         pathWP = path;
         currentStep = 0;
     }
 
+    public void switchWeapon(EquipmentItemData itemData)
+    {
+        if (itemData != null)
+        {
+            equipment.equipItem(itemData);
+
+            updateEquipment();
+        }
+    }
+
+    public void updateEquipment()
+    {
+        plugin.updateCurrentData(equipment.getEquipmentData());
+    }
 
     int currentStep = 0;
 
-    private void updatePathing()
+    public void updateWeaponAnimation()
+    {
+        /*var characterObject = dummyCharacter.getCharacterObject();
+
+        setAnimation(dummyCharacter, characterObject.getBaseAnimation());*/
+        var weaponAnimData = getWeaponAnimationData();
+        setWeaponAnimationData(dummyCharacter.getCharacterObject(), weaponAnimData);
+        //setAnimation(dummyCharacter, dummyCharacter.getCharacterObject().getBaseAnimation(), AnimationType.STANDARD, false);
+
+    }
+
+    public boolean isInMeleeRange()
+    {
+        CharacterObject dummyObject = plugin.dummy.dummyCharacter.getCharacterObject();
+        LocalPoint localPoint = dummyObject.getLocation();
+        var dummyWP = WorldPoint.fromLocal(client, localPoint);
+
+        return EquipmentUtility.isInRange(dummyWP, client.getLocalPlayer().getWorldLocation(), 1);
+    }
+
+    private void reachedEndOfPath()
+    {
+        setState(CharacterState.IDLE);
+        setAnimation(dummyCharacter.getCharacterObject().getBaseAnimation(), AnimationType.STANDARD, true);
+        dummyCharacter.getCharacterObject().isMoving = false;
+    }
+
+
+    private boolean updatePathing()
     {
         WorldView worldView = client.getTopLevelWorldView();
 
         var characterObject = dummyCharacter.getCharacterObject();
 
-        characterObject.setAnimationFrame(characterObject.getAnimationFrame(), false);
-
-        if (!characterObject.isMoving) return;
+        characterObject.setAnimationFrame(characterObject.getAnimationFrame());
 
         boolean instance = worldView.getScene().isInstance();
-
-        if (characterObject == null)
-            return;
-
-        if (!isInScene(dummyCharacter))
-            return;
-
-
 
         //int pathLength = instance ? comp.getPathLP().length : comp.getPathWP().length;
         var pathLength = pathWP.length;
 
-        if (pathLength <= 0)
+        if (pathLength <= 0 || !isInScene(dummyCharacter))
         {
-            characterObject.isMoving = false;
-            setAnimation(dummyCharacter, characterObject.getBaseAnimation());
-            log.info("NO PATH!");
-            return;
+            return false;
         }
-
-
-
 
         LocalPoint start = characterObject.getLocation();
 
@@ -176,6 +256,7 @@ public class Dummy extends Combatant
         /*log.info("Distance To: " + distance);*/
         //characterObject.isRunning = isTryingToRun && distance > 1;
 
+        if (pathWP.length <= currentStep) return false;
         LocalPoint destination;
 
         /*if (instance)
@@ -189,7 +270,7 @@ public class Dummy extends Combatant
 
         if (destination == null)
         {
-            return;
+            return false;
         }
 
         if (start.getX() == destination.getX() && start.getY() == destination.getY())
@@ -198,15 +279,15 @@ public class Dummy extends Combatant
             currentStep++;
             if (currentStep >= pathWP.length)
             {
-                log.info("Reached Destination!");
-                characterObject.isMoving = false;
-                setAnimation(dummyCharacter, characterObject.getBaseAnimation());
-                dummyCharacter.getCharacterObject().setLoop(true);
-                return;
+                //log.info("Reached Destination!");
+                reachedEndOfPath();
+                //setAnimation(dummyCharacter, characterObject.getBaseAnimation(), AnimationType.STANDARD, false);
+                //dummyCharacter.getCharacterObject().setLoop(true);
+                return false;
             }
         }
 
-        setAnimation(dummyCharacter, characterObject.getBaseAnimation());
+        //setAnimation(dummyCharacter, characterObject.getBaseAnimation(), AnimationType.STANDARD, false); TODO READD
 
         double speed = (128 * ((double) clientTickDelta / 600) * (characterObject.isRunning ? 2 : 1));
         double turnSpeed = (128 * ((double) clientTickDelta / 75));
@@ -258,7 +339,10 @@ public class Dummy extends Combatant
         //LocalPoint finalPoint = new LocalPoint(endX, endY, worldView);
         //log.info("Setting Location: " + finalPoint);
         characterObject.setLocation(moveToPoint, worldView.getPlane());
+        return true;
     }
+
+
 
     public LocalPoint moveTowards(LocalPoint start, LocalPoint end, double amountToMove)
     {
@@ -283,6 +367,8 @@ public class Dummy extends Combatant
     public void moveTo(LocalPoint targetPoint, boolean run)
     {
 
+        if (state == CharacterState.DOING_ACTION) return;
+
         lookingAtTarget = false;
         isTryingToRun = run;
 
@@ -292,17 +378,19 @@ public class Dummy extends Combatant
 
         if (step == null) return;
         WorldPoint[] path = new WorldPoint[step.length];
-        for (int i = 0; i < step.length; i++) {
+        for (int i = 0; i < step.length; i++)
+        {
             if (step.length != 0)
             {
                 int[] first = step[i];
                 var worldPoint = WorldPoint.fromScene(worldView, first[0], first[1], worldView.getPlane());
                 path[i] = worldPoint;
-                log.info("" + i + " | " + worldPoint);
             }
         }
 
         setPathWP(path);
+        setState(CharacterState.MOVING);
+        log.info("4 - MOVING");
         dummyCharacter.getCharacterObject().isMoving = true;
         dummyCharacter.getCharacterObject().isRunning = false;
 
@@ -383,8 +471,9 @@ public class Dummy extends Combatant
     public void setCombatStyle(CombatStyle combatStyle)
     {
         log.info("Combat Style Swapped: " + combatStyle);
-        plugin.setCombatStyle(combatStyle);
+        equipCombatStyle(combatStyle);
         this.combatStyle = combatStyle;
+        updateEquipment();
     }
 
     public void spawn()
@@ -498,8 +587,8 @@ public class Dummy extends Combatant
         plugin.clientThread.invoke(() ->
         {
             setModel(setupCharacter, getModel());
-            setAnimation(setupCharacter, weaponAnimationData != null ? weaponAnimationData.idleID : 808);
-            setAnimationFrame(setupCharacter, 0, true);
+            setAnimation(setupCharacter, weaponAnimationData != null ? weaponAnimationData.idleID : 808, AnimationType.STANDARD, true);
+            setAnimationFrame(setupCharacter, 0);
             setLocation(setupCharacter, !setupCharacter.isLocationSet(), false, setHoveredTile, false);
 
             setupObject.setActive(active);
@@ -531,6 +620,8 @@ public class Dummy extends Combatant
     @Override
     public void fightStarted()
     {
+        setHealth(getMaxHP());
+
         resetConsumables();
         startLocation = WorldPoint.fromLocal(client, dummyCharacter.getCharacterObject().getLocation());
     }
@@ -540,7 +631,7 @@ public class Dummy extends Combatant
     {
         combatAI.reset();
         reset();
-        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, config.dummyHitPoints(), config.dummyHitPoints()));
+        plugin.healthOverlay.setPlayerHealthKeyFrame(new HealthKeyFrame(plugin.getTicks(), 1, HealthbarSprite.DEFAULT, getMaxHP(), getMaxHP()));
 
 
     }
@@ -553,29 +644,32 @@ public class Dummy extends Combatant
     }
 
     @Override
-    public void setAnimation(int animationId)
+    public void setAnimation(int animationId, AnimationType type, boolean loop)
     {
-        setAnimation(dummyCharacter, animationId);
-        setAnimationFrame(dummyCharacter, 0, false);
-        dummyCharacter.getCharacterObject().setLoop(false);
+        setAnimation(dummyCharacter, animationId, type, loop);
+        if (animationId != dummyCharacter.getCharacterObject().getAnimationId())
+        {
+            // Make it only set anim frame to 0 if a new animation is set over the current one
+            setAnimationFrame(dummyCharacter, 0);
+        }
     }
 
-    public void setAnimation(Character character, int animationId)
+    public void setAnimation(Character character, int animationId, AnimationType type, boolean loop)
     {
         if (client.getGameState() != GameState.LOGGED_IN)
             return;
 
         CharacterObject characterObject = character.getCharacterObject();
-        plugin.clientThread.invoke(() -> characterObject.setAnimation(animationId));
+        plugin.clientThread.invoke(() -> characterObject.setAnimation(animationId, type, loop));
     }
 
-    public void setAnimationFrame(Character character, int animFrame, boolean allowPause)
+    public void setAnimationFrame(Character character, int animFrame)
     {
         if (client.getGameState() != GameState.LOGGED_IN)
             return;
 
         CharacterObject characterObject = character.getCharacterObject();
-        plugin.clientThread.invoke(() -> characterObject.setAnimationFrame(animFrame, allowPause));
+        plugin.clientThread.invoke(() -> characterObject.setAnimationFrame(animFrame));
     }
 
     public void setOrientation(Character character, int orientation)
@@ -739,7 +833,9 @@ public class Dummy extends Combatant
 
     public void moveToRandom()
     {
-        var targetTile = EquipmentUtility.getRandomWalkableWorldPoint(client, startLocation, 4);
+        if (isFrozen) return;
+
+        var targetTile = EquipmentUtility.getRandomWalkableWorldPoint(client, client.getLocalPlayer().getWorldLocation(), 4);
         if (targetTile != null)
         {
             moveTo(LocalPoint.fromWorld(client.getTopLevelWorldView(), targetTile), true);
@@ -751,6 +847,8 @@ public class Dummy extends Combatant
     public void attackedTarget(Combatant combatant, DamageData data, DamageInfo damageInfo)
     {
         isTryingToSpec = false;
+
+        setState(CharacterState.DOING_ACTION);
 
         plugin.totalHitsOnPlayer++;
         plugin.totalOffPrayerHitsOnPlayer += !damageInfo.onPrayer ? 1 : 0;
@@ -765,7 +863,8 @@ public class Dummy extends Combatant
     }
 
     @Override
-    public int getSpecCount() {
+    public int getSpecCount()
+    {
         return 1;
     }
 
@@ -784,7 +883,7 @@ public class Dummy extends Combatant
     @Override
     public CombatantSkills getSkills()
     {
-        return new CombatantSkills(99, 99, 99, 99, 99);
+        return plugin.fightPanel.getDummySkills();
     }
 
     @Override
@@ -811,6 +910,12 @@ public class Dummy extends Combatant
 
 
         return null;
+    }
+
+    @Override
+    public int getMaxHP()
+    {
+        return plugin.fightPanel.getDummyHP();
     }
 
     @Override
@@ -850,10 +955,10 @@ public class Dummy extends Combatant
         var weaponAnimData = getWeaponAnimationData();
         if (weaponAnimData != null)
         {
-            setAnimation(weaponAnimData.hitID);
+            setAnimation(weaponAnimData.hitID, AnimationType.ACTIVE, false);
         }
         EquipmentUtility.playCombatStyleHitSound(client, data.combatStyle);
-        plugin.healthOverlay.setDummyHealthKey(new HealthKeyFrame(plugin.getTicks(), 10, HealthbarSprite.DEFAULT, config.dummyHitPoints(), getHealth()));
+        plugin.healthOverlay.setDummyHealthKey(new HealthKeyFrame(plugin.getTicks(), 10, HealthbarSprite.DEFAULT, getMaxHP(), getHealth()));
 
         if (getHealth() <= 0)
         {
@@ -881,6 +986,7 @@ public class Dummy extends Combatant
 
     public void moveToPlayer(boolean run)
     {
+        if (isFrozen) return;
         var worldPoint = WorldPoint.fromLocal(client, dummyCharacter.getCharacterObject().getLocation());
         var targetPoint = EquipmentUtility.getNearestAdjacentTile(worldPoint, client.getLocalPlayer().getWorldLocation(), 0);
         moveTo(LocalPoint.fromWorld(client.getTopLevelWorldView(), targetPoint), run);
@@ -888,6 +994,7 @@ public class Dummy extends Combatant
 
     public void moveToUnderPlayer(boolean run)
     {
+        if (isFrozen) return;
         moveTo(client.getLocalPlayer().getLocalLocation(), run);
     }
 

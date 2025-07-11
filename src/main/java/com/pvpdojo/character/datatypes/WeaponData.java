@@ -5,6 +5,7 @@ import com.pvpdojo.combat.weapon.WeaponStyleControl;
 import com.pvpdojo.combat.weapon.WeaponStyleType;
 import com.pvpdojo.combat.weapon.WeaponUtility;
 import net.runelite.api.Skill;
+import net.runelite.client.game.ItemStats;
 
 public class WeaponData
 {
@@ -16,8 +17,9 @@ public class WeaponData
     private final int styleIndex;
     private final String styleName;
     private final boolean isRapid;
+    private final ItemStats itemStats;
 
-    public WeaponData(int weaponID, int weaponType, String weaponTypeName, WeaponStyleControl styleControl, WeaponStyleType styleType, int styleIndex, String styleName, boolean isRapid) {
+    public WeaponData(int weaponID, int weaponType, String weaponTypeName, WeaponStyleControl styleControl, WeaponStyleType styleType, int styleIndex, String styleName, boolean isRapid, ItemStats itemStats) {
         this.weaponID = weaponID;
         this.weaponType = weaponType;
         this.weaponTypeName = weaponTypeName;
@@ -26,6 +28,26 @@ public class WeaponData
         this.styleIndex = styleIndex;
         this.styleName = styleName;
         this.isRapid = isRapid;
+        this.itemStats = itemStats;
+    }
+
+    @Override
+    public String toString() {
+        return "WeaponData{" +
+                "\nweaponID=" + weaponID +
+                ", \nweaponType=" + weaponType +
+                ", \nweaponTypeName='" + weaponTypeName + '\'' +
+                ", \nstyleControl=" + styleControl +
+                ", \nstyleType=" + styleType +
+                ", \nstyleIndex=" + styleIndex +
+                ", \nstyleName='" + styleName + '\'' +
+                ", \nisRapid=" + isRapid +
+                ", \nitemStats=" + itemStats +
+                '}';
+    }
+
+    public boolean isTwoHanded() {
+        return itemStats.getEquipment().isTwoHanded();
     }
 
     public int getWeaponID() { return weaponID; }
@@ -91,9 +113,9 @@ public class WeaponData
         }
     }
 
-    public CombatStyle getWeaponCombatStyle()
+    public CombatStyle getWeaponCombatStyle(boolean includeStaffAsMage)
     {
-        if (weaponType == 18) return CombatStyle.MAGIC; // if its a staff it'll auto return magic.
+        if (weaponType == 18 && includeStaffAsMage) return CombatStyle.MAGIC; // if its a staff it'll auto return magic.
 
         switch (getStyleType())
         {

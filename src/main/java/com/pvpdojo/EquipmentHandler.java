@@ -45,11 +45,28 @@ public class EquipmentHandler
 
     public void equipItem(EquipmentItemData itemData)
     {
+        if (itemData.slot == EquipmentInventorySlot.WEAPON)
+        {
+            if (itemData.weaponData != null && itemData.weaponData.isTwoHanded())
+            {
+                equippedEquipment.remove(EquipmentInventorySlot.SHIELD);
+            }
+        }
         equippedEquipment.put(itemData.slot, itemData);
     }
 
     public void unequipSlot(EquipmentInventorySlot slot)
     {
         equippedEquipment.remove(slot);
+    }
+
+    public void equipData(EquipmentData equipmentData)
+    {
+        equippedEquipment.clear();
+
+        for (EquipmentItemData itemData : equipmentData.equipmentList)
+        {
+            equippedEquipment.put(itemData.slot, itemData);
+        }
     }
 }

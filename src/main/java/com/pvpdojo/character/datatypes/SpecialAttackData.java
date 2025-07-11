@@ -19,4 +19,16 @@ public class SpecialAttackData
         this.instantHit = instantHit;
         this.specialAttackSound = specSound;
     }
+
+    @Override
+    public String toString() {
+        return "SpecialAttackData{" +
+                "energy=" + energy +
+                ", damageMultiplier=" + damageMultiplier +
+                ", accuracyMultiplier=" + accuracyMultiplier +
+                ", attackCount=" + attackCount +
+                ", instantHit=" + instantHit +
+                ", specialAttackSound=" + specialAttackSound +
+                '}';
+    }
 }

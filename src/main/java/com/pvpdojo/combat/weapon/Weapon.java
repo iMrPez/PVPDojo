@@ -25,7 +25,7 @@ public enum Weapon
 
     DRAGON_SCIMITAR(4587,"Dragon Scimitar",  2500, 513,
             new SpecialAttackData(55, 1f, 1.25f, 1, false, 2540),
-            new WeaponAnimationData(808, 819, 825,1872, 390, 390, 386, 390, 4177)),
+            new WeaponAnimationData(808, 819, 824,1872, 390, 390, 386, 390, 4177)),
 
     ABYSSAL_WHIP(4151,"Abyssal Whip",  2720, 513,
             new SpecialAttackData(50, 1f, 1.25f, 2, false, 2713),

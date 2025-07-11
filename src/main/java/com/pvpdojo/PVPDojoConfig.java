@@ -89,25 +89,6 @@ public interface PVPDojoConfig extends Config
     }
 
     @ConfigSection(
-            name = "Player Settings",
-            description = "Player Settings",
-            position = 6
-    )
-    String playerSettings = "playerSettings";
-
-    @ConfigItem(
-            keyName = "playerHitPoints",
-            name = "Player HitPoints",
-            description = "Player HitPoints",
-            section = playerSettings,
-            position = 0
-    )
-    default int playerHitPoints()
-    {
-        return 99;
-    }
-
-    @ConfigSection(
             name = "Dummy Settings",
             description = "Dummy Settings.",
             position = 2
@@ -115,16 +96,13 @@ public interface PVPDojoConfig extends Config
     String dummySettings = "dummySettings";
 
     @ConfigItem(
-            keyName = "dummyHitPoints",
-            name = "Dummy HitPoints",
-            description = "Dummy HitPoints",
+            keyName = "useDummyAI",
+            name = "Use Dummy AI",
+            description = "Should the Dummy fight?",
             section = dummySettings,
             position = 0
     )
-    default int dummyHitPoints()
-    {
-        return 99;
-    }
+    default boolean useDummyAI() { return true; }
 
     @ConfigItem(
             keyName = "useProtectionPrayers",
@@ -135,7 +113,7 @@ public interface PVPDojoConfig extends Config
     )
     default boolean useProtectionPrayers() { return true; }
 
-    @ConfigItem(
+    /*@ConfigItem(
             keyName = "useOffensivePrayers",
             name = "Use Offensive Prayer",
             description = "Should the Dummy use offensive prayers?",
@@ -157,7 +135,7 @@ public interface PVPDojoConfig extends Config
     default boolean useDefensivePrayers()
     {
         return true;
-    }
+    }*/
 
     @ConfigItem(
             keyName = "useIceBarrage",
@@ -275,18 +253,6 @@ public interface PVPDojoConfig extends Config
     }
 
     @ConfigItem(
-            keyName = "minPrayerSwapDelay",
-            name = "Min Prayer Swap Delay",
-            description = "Min Amount of ticks before the Dummy uses protection prayer from what you're using",
-            section = dummySettings,
-            position = 2
-    )
-    default int minPrayerSwapDelay()
-    {
-        return 2;
-    }
-
-    @ConfigItem(
             keyName = "equipmentSwapDelay",
             name = "Equipment Swap Delay",
             description = "Max Amount of ticks before the Dummy swaps gear to attack with what you're not protecting from",
@@ -296,18 +262,6 @@ public interface PVPDojoConfig extends Config
     default int equipmentSwapDelay()
     {
         return 15;
-    }
-
-    @ConfigItem(
-            keyName = "minEquipmentSwapDelay",
-            name = "Min Equipment Swap Delay",
-            description = "Min Amount of ticks before the Dummy swaps gear to attack with what you're not protecting from",
-            section = dummySettings,
-            position = 4
-    )
-    default int minEquipmentSwapDelay()
-    {
-        return 2;
     }
 
 }
